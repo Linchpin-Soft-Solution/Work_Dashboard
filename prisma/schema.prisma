@@ -1,0 +1,241 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                               String          @id @default(cuid())
+  name                             String
+  email                            String          @unique
+  password                         String?
+  role                             Role            @default(EMPLOYEE)
+  designation                      String?
+  baseMonthlySalary                Float           @default(0.0)
+  isActive                         Boolean         @default(true)
+  createdAt                        DateTime        @default(now())
+  updatedAt                        DateTime        @updatedAt
+
+  Attendance                       Attendance[]
+  CalendarEvent                    CalendarEvent[]
+  DailyLog                         DailyLog[]
+  Invoice                          Invoice[]
+  MonthlyLog                       MonthlyLog[]
+  PayRecord                        PayRecord[]
+  WeeklyLog                        WeeklyLog[]
+  Target_Target_assignedByIdToUser Target[]        @relation("Target_assignedByIdToUser")
+  Target_Target_assignedToIdToUser Target[]        @relation("Target_assignedToIdToUser")
+}
+
+model Attendance {
+  id                  String           @id @default(cuid())
+  userId              String
+  date                DateTime
+  checkInTime         DateTime?
+  checkOutTime        DateTime?
+  status              AttendanceStatus @default(ABSENT)
+  payMultiplier       Float            @default(1.0)
+  dailyLogSubmitted   Boolean          @default(false)
+  overrideReason      String?
+  overriddenByAdminId String?
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+
+  User User @relation(fields: [userId], references: [id])
+
+  @@unique([userId, date])
+}
+
+model DailyLog {
+  id                 String   @id @default(cuid())
+  userId             String
+  date               DateTime
+  content            String
+  submittedByAdminId String?
+  overrideReason     String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  User User @relation(fields: [userId], references: [id])
+
+  @@unique([userId, date])
+}
+
+model WeeklyLog {
+  id         String   @id @default(cuid())
+  userId     String
+  weekStart  DateTime
+  rawSummary String?
+  aiSummary  String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  User User @relation(fields: [userId], references: [id])
+
+  @@unique([userId, weekStart])
+}
+
+model MonthlyLog {
+  id         String   @id @default(cuid())
+  userId     String
+  month      DateTime
+  rawSummary String?
+  aiSummary  String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  User User @relation(fields: [userId], references: [id])
+
+  @@unique([userId, month])
+}
+
+model Target {
+  id           String          @id @default(cuid())
+  assignedById String
+  assignedToId String
+  title        String
+  description  String?
+  priority     TargetPriority  @default(MEDIUM)
+  timeframe    TargetTimeframe @default(DAILY)
+  dueDate      DateTime?
+  status       TargetStatus    @default(PENDING)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  User_Target_assignedByIdToUser User @relation("Target_assignedByIdToUser", fields: [assignedById], references: [id])
+  User_Target_assignedToIdToUser User @relation("Target_assignedToIdToUser", fields: [assignedToId], references: [id])
+}
+
+model CalendarEvent {
+  id            String   @id @default(cuid())
+  userId        String
+  title         String
+  description   String?
+  startTime     DateTime
+  endTime       DateTime
+  isPrivate     Boolean  @default(true)
+  isCompanyWide Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  User User @relation(fields: [userId], references: [id])
+}
+
+model Invoice {
+  id            String        @id @default(cuid())
+  createdById   String
+  invoiceNumber String        @unique
+  clientName    String
+  clientAddress String?
+  clientGstin   String?
+  lineItems     Json
+  gstRate       Float         @default(18.0)
+  subtotal      Float         @default(0.0)
+  gstAmount     Float         @default(0.0)
+  totalAmount   Float
+  status        InvoiceStatus @default(DRAFT)
+  isQuotation   Boolean       @default(false)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  User User @relation(fields: [createdById], references: [id])
+}
+
+model PayRecord {
+  id            String          @id @default(cuid())
+  userId        String
+  month         DateTime
+  baseSalary    Float
+  workingDays   Int
+  presentDays   Int
+  lateDays      Int
+  absentDays    Int             @default(0)
+  calculatedPay Float
+  finalPay      Float           @default(0.0)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  User          User            @relation(fields: [userId], references: [id])
+  PayAdjustment PayAdjustment[]
+
+  @@unique([userId, month])
+}
+
+model PayAdjustment {
+  id               String         @id @default(cuid())
+  payRecordId      String
+  amount           Float
+  type             AdjustmentType
+  reason           String
+  createdByAdminId String
+  createdAt        DateTime       @default(now())
+
+  PayRecord PayRecord @relation(fields: [payRecordId], references: [id])
+}
+
+model DailyReport {
+  id          String   @id @default(cuid())
+  date        DateTime @unique
+  content     String
+  generatedAt DateTime @default(now())
+  emailSent   Boolean  @default(false)
+}
+
+model AuditLog {
+  id             String   @id @default(cuid())
+  adminId        String
+  actionType     String
+  affectedUserId String?
+  details        String
+  reason         String
+  createdAt      DateTime @default(now())
+}
+
+enum Role {
+  ADMIN
+  EMPLOYEE
+  INTERN
+}
+
+enum AttendanceStatus {
+  PRESENT
+  LATE
+  ABSENT
+  HOLIDAY
+}
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PAID
+}
+
+enum AdjustmentType {
+  BONUS
+  DEDUCTION
+  SICK_LEAVE
+  OTHER
+}
+
+enum TargetPriority {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum TargetStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  OVERDUE
+}
+
+enum TargetTimeframe {
+  DAILY
+  WEEKLY
+  MONTHLY
+}
