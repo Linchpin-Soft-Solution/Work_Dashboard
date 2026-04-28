@@ -21,21 +21,48 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "type and date are required" }, { status: 400 });
   }
 
-  const parsedDate = new Date(dateParam);
-
+  const startDate = new Date(dateParam);
+  let endDate = new Date(startDate);
   if (type === "weekly") {
-    const summary = await prisma.weeklyLog.findUnique({
-      where: { userId_weekStart: { userId: targetUserId, weekStart: parsedDate } },
-    });
-    return NextResponse.json({ summary });
+    endDate.setDate(startDate.getDate() + 7);
   } else if (type === "monthly") {
-    const summary = await prisma.monthlyLog.findUnique({
-      where: { userId_month: { userId: targetUserId, month: parsedDate } },
-    });
-    return NextResponse.json({ summary });
+    endDate.setMonth(startDate.getMonth() + 1);
   }
 
-  return NextResponse.json({ error: "Invalid type" }, { status: 400 });
+  let summary: any = null;
+  if (type === "weekly") {
+    summary = await prisma.weeklyLog.findUnique({
+      where: { userId_weekStart: { userId: targetUserId, weekStart: startDate } },
+    });
+  } else if (type === "monthly") {
+    summary = await prisma.monthlyLog.findUnique({
+      where: { userId_month: { userId: targetUserId, month: startDate } },
+    });
+  } else {
+    return NextResponse.json({ error: "Invalid type" }, { status: 400 });
+  }
+
+  const logs = await prisma.dailyLog.findMany({
+    where: {
+      userId: targetUserId,
+      date: {
+        gte: startDate,
+        lt: endDate,
+      },
+    },
+    orderBy: { date: "asc" },
+  });
+
+  const liveRawSummary = logs.length > 0
+    ? logs.map((l) => `${l.date.toISOString().slice(0, 10)}:\n${l.content}`).join("\n\n")
+    : null;
+
+  return NextResponse.json({
+    summary: {
+      rawSummary: liveRawSummary || summary?.rawSummary || null,
+      aiSummary: summary?.aiSummary || null,
+    }
+  });
 }
 
 // POST /api/logs/summary/generate
