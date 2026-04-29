@@ -2,6 +2,12 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
+import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface AttendanceRecord {
@@ -89,6 +95,14 @@ function EmployeeView({ userId }: { userId: string }) {
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [msg, setMsg] = useState<{ text: string; ok: boolean } | null>(null);
+  const [popoverOpen, setPopoverOpen] = useState(false);
+  const [pickerYear, setPickerYear] = useState(parseInt(currentMonthValue().slice(0, 4), 10));
+
+  useEffect(() => {
+    if (popoverOpen) {
+      setPickerYear(parseInt(month.slice(0, 4), 10));
+    }
+  }, [popoverOpen, month]);
 
   const fetchRecords = useCallback(async () => {
     setLoading(true);
@@ -222,12 +236,53 @@ function EmployeeView({ userId }: { userId: string }) {
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
             </button>
-            <input
-              type="month"
-              value={month}
-              onChange={(e) => setMonth(e.target.value)}
-              className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
+            <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+              <PopoverTrigger render={
+                <Button
+                  variant={"outline"}
+                  className={cn(
+                    "w-[160px] justify-start text-left font-normal",
+                    !month && "text-muted-foreground"
+                  )}
+                />
+              }>
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {month ? format(new Date(month + "-01T00:00:00"), "MMMM yyyy") : <span>Pick a month</span>}
+              </PopoverTrigger>
+              <PopoverContent className="w-64 p-3" align="center">
+                <div className="flex items-center justify-between pb-3">
+                  <Button variant="outline" size="icon" onClick={() => setPickerYear(y => y - 1)}>
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <div className="text-sm font-semibold">{pickerYear}</div>
+                  <Button variant="outline" size="icon" onClick={() => setPickerYear(y => y + 1)}>
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+                  ].map((m, i) => {
+                    const val = `${pickerYear}-${String(i + 1).padStart(2, "0")}`;
+                    const isSelected = val === month;
+                    return (
+                      <Button
+                        key={m}
+                        variant={isSelected ? "default" : "ghost"}
+                        className="text-xs h-9"
+                        onClick={() => {
+                          setMonth(val);
+                          setPopoverOpen(false);
+                        }}
+                      >
+                        {m}
+                      </Button>
+                    );
+                  })}
+                </div>
+              </PopoverContent>
+            </Popover>
             <button
               onClick={() => setMonth(prev => addMonths(prev + "-01", 1).slice(0, 7))}
               className="p-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 transition"
@@ -581,12 +636,33 @@ function AdminView() {
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
             </button>
-            <input
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
+            <Popover>
+              <PopoverTrigger render={
+                <Button
+                  variant={"outline"}
+                  className={cn(
+                    "w-[160px] justify-start text-left font-normal",
+                    !date && "text-muted-foreground"
+                  )}
+                />
+              }>
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {date ? format(new Date(date), "PPP") : <span>Pick a date</span>}
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="center">
+                <Calendar
+                  mode="single"
+                  selected={date ? new Date(date) : undefined}
+                  onSelect={(d) => {
+                    if (d) {
+                      const ist = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
+                      setDate(ist.toISOString().slice(0, 10));
+                    }
+                  }}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
             <button
               onClick={() => setDate(prev => addDays(prev, 1))}
               className="p-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 transition"
