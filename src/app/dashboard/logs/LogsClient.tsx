@@ -1,13 +1,24 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { ChevronLeft, ChevronRight, Loader2, CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 type TabType = "daily" | "weekly" | "monthly";
 
 function getWeekStart(dateStr: string) {
   const d = new Date(dateStr);
   const day = d.getDay();
-  const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Adjust when day is Sunday
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
   d.setDate(diff);
   return d.toISOString().slice(0, 10);
 }
@@ -54,14 +65,13 @@ export default function LogsClient({
   const [dailySaving, setDailySaving] = useState(false);
   const [dailyMsg, setDailyMsg] = useState<{ text: string; ok: boolean } | null>(null);
 
-  // Summary State (Weekly/Monthly)
+  // Summary State
   const [summaryDate, setSummaryDate] = useState(todayValue());
   const [summaryData, setSummaryData] = useState<any>(null);
   const [summaryLoading, setSummaryLoading] = useState(false);
   const [summaryGenerating, setSummaryGenerating] = useState(false);
   const [summaryMsg, setSummaryMsg] = useState<{ text: string; ok: boolean } | null>(null);
 
-  // Fetch Daily Log
   const fetchDailyLog = useCallback(async () => {
     setDailyLoading(true);
     setDailyMsg(null);
@@ -81,7 +91,6 @@ export default function LogsClient({
     if (activeTab === "daily") fetchDailyLog();
   }, [fetchDailyLog, activeTab]);
 
-  // Submit Daily Log
   const submitDailyLog = async () => {
     if (!dailyContent.trim()) {
       setDailyMsg({ text: "Log content cannot be empty.", ok: false });
@@ -117,7 +126,6 @@ export default function LogsClient({
     }
   };
 
-  // Fetch Summary
   const fetchSummary = useCallback(async () => {
     setSummaryLoading(true);
     setSummaryMsg(null);
@@ -141,7 +149,6 @@ export default function LogsClient({
     if (activeTab !== "daily") fetchSummary();
   }, [fetchSummary, activeTab]);
 
-  // Generate Summary
   const generateSummary = async () => {
     setSummaryGenerating(true);
     setSummaryMsg(null);
@@ -170,44 +177,49 @@ export default function LogsClient({
     }
   };
 
+  const dailyDateObj = dailyDate ? new Date(dailyDate) : undefined;
+  const summaryDateObj = summaryDate ? new Date(summaryDate) : undefined;
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Daily Logs</h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">Daily Logs</h1>
+          <p className="text-sm text-muted-foreground mt-1">
             {isAdmin ? "Manage team logs and generate summaries." : "Document your daily work and generate summaries."}
           </p>
         </div>
 
         {isAdmin && (
-          <div className="bg-white p-2 rounded-xl border border-gray-200 shadow-sm">
-            <label className="sr-only">Select Employee</label>
-            <select
-              value={selectedUserId}
-              onChange={(e) => setSelectedUserId(e.target.value)}
-              className="text-sm font-medium text-gray-800 bg-transparent focus:outline-none focus:ring-0 px-2 py-1 w-48"
-            >
-              {users.map((u) => (
-                <option key={u.id} value={u.id}>
-                  {u.name} {u.id === session.user.id && "(You)"}
-                </option>
-              ))}
-            </select>
+          <div className="w-full md:w-64">
+            <Label className="sr-only">Select Employee</Label>
+            <Select value={selectedUserId} onValueChange={setSelectedUserId}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select an employee">
+                  {users.find(u => u.id === selectedUserId)?.name || "Select an employee"}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                {users.map((u) => (
+                  <SelectItem key={u.id} value={u.id}>
+                    {u.name} {u.id === session.user.id && "(You)"}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         )}
       </div>
 
-      {/* Tabs */}
-      <div className="flex border-b border-gray-200 gap-6">
+      <div className="flex border-b border-border gap-6 overflow-x-auto pb-1">
         {(["daily", "weekly", "monthly"] as TabType[]).map((tab) => (
           <button
             key={tab}
             onClick={() => { setActiveTab(tab); setDailyMsg(null); setSummaryMsg(null); }}
-            className={`pb-3 text-sm font-medium transition ${
+            className={`pb-2 text-sm font-medium transition whitespace-nowrap ${
               activeTab === tab
-                ? "border-b-2 border-indigo-600 text-indigo-600"
-                : "text-gray-500 hover:text-gray-800"
+                ? "border-b-2 border-primary text-primary"
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
             {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -215,190 +227,250 @@ export default function LogsClient({
         ))}
       </div>
 
-      {/* Tab Content */}
       {activeTab === "daily" && (
-        <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-gray-800">Daily Log</h3>
-            <div className="flex items-center gap-2">
-              <button
+        <Card>
+          <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4">
+            <CardTitle className="text-lg">Daily Log</CardTitle>
+            <div className="flex flex-wrap items-center gap-2">
+              <Button
+                variant="outline"
+                size="icon"
                 onClick={() => setDailyDate(prev => addDays(prev, -1))}
-                className="p-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 transition"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
-              </button>
-              <input
-                type="date"
-                value={dailyDate}
-                onChange={(e) => setDailyDate(e.target.value)}
-                className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              />
-              <button
-                onClick={() => setDailyDate(prev => addDays(prev, 1))}
-                className="p-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 transition"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
-              </button>
-            </div>
-          </div>
-
-          {dailyDate === todayValue() && !dailyLog && (
-            <div className="mb-4 bg-amber-50 text-amber-700 border border-amber-200 px-4 py-2.5 rounded-lg text-sm font-medium">
-              ⚠️ You haven't submitted your log for today.
-            </div>
-          )}
-
-          {dailyLog?.submittedByAdminId && (
-            <div className="mb-4 bg-amber-50 text-amber-700 border border-amber-200 px-4 py-2.5 rounded-lg text-sm">
-              <span className="font-bold">Overridden by Admin:</span> {dailyLog.overrideReason}
-            </div>
-          )}
-
-          {dailyLoading ? (
-            <div className="py-12 text-center text-sm text-gray-400">Loading…</div>
-          ) : (
-            <div className="space-y-4">
-              <textarea
-                rows={6}
-                value={dailyContent}
-                onChange={(e) => setDailyContent(e.target.value)}
-                placeholder="What did you work on today? Provide a detailed log..."
-                className="w-full border border-gray-200 rounded-xl p-4 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
-              />
-
-              {isAdmin && selectedUserId !== session.user.id && (
-                <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">
-                    Override Reason <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={overrideReason}
-                    onChange={(e) => setOverrideReason(e.target.value)}
-                    placeholder="Why are you submitting this log on behalf of the employee?"
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              
+              <Popover>
+                <PopoverTrigger render={
+                  <Button
+                    variant={"outline"}
+                    className={cn(
+                      "w-[160px] justify-start text-left font-normal",
+                      !dailyDate && "text-muted-foreground"
+                    )}
                   />
-                </div>
-              )}
+                }>
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {dailyDate ? format(new Date(dailyDate), "PPP") : <span>Pick a date</span>}
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="center">
+                  <Calendar
+                    mode="single"
+                    selected={dailyDateObj}
+                    onSelect={(d) => {
+                      if (d) {
+                        const ist = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
+                        setDailyDate(ist.toISOString().slice(0, 10));
+                      }
+                    }}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
 
-              {dailyMsg && (
-                <div
-                  className={`text-sm px-4 py-2.5 rounded-lg ${
-                    dailyMsg.ok
-                      ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                      : "bg-red-50 text-red-600 border border-red-200"
-                  }`}
-                >
-                  {dailyMsg.text}
-                </div>
-              )}
-
-              <div className="flex justify-end">
-                <button
-                  onClick={submitDailyLog}
-                  disabled={dailySaving || (!dailyContent.trim())}
-                  className="px-6 py-2.5 rounded-xl text-sm font-semibold bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50 transition"
-                >
-                  {dailySaving ? "Saving…" : dailyLog ? "Update Log" : "Submit Log"}
-                </button>
-              </div>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setDailyDate(prev => addDays(prev, 1))}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
             </div>
-          )}
-        </div>
+          </CardHeader>
+          <CardContent>
+            {dailyDate === todayValue() && !dailyLog && (
+              <div className="mb-6 bg-amber-50 text-amber-800 border border-amber-200 px-4 py-3 rounded-lg text-sm font-medium">
+                ⚠️ You haven't submitted your log for today.
+              </div>
+            )}
+
+            {dailyLog?.submittedByAdminId && (
+              <div className="mb-6 bg-amber-50 text-amber-800 border border-amber-200 px-4 py-3 rounded-lg text-sm">
+                <span className="font-semibold">Overridden by Admin:</span> {dailyLog.overrideReason}
+              </div>
+            )}
+
+            {dailyLoading ? (
+              <div className="py-12 flex justify-center items-center">
+                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                <span className="ml-2 text-sm text-muted-foreground">Loading log...</span>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-4">
+                <Textarea
+                  rows={6}
+                  value={dailyContent}
+                  onChange={(e) => setDailyContent(e.target.value)}
+                  placeholder="What did you work on today? Provide a detailed log..."
+                  className="resize-y"
+                />
+
+                {isAdmin && selectedUserId !== session.user.id && (
+                  <div className="space-y-2">
+                    <Label>
+                      Override Reason <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
+                      value={overrideReason}
+                      onChange={(e) => setOverrideReason(e.target.value)}
+                      placeholder="Why are you submitting this log on behalf of the employee?"
+                    />
+                  </div>
+                )}
+
+                {dailyMsg && (
+                  <div
+                    className={`text-sm px-4 py-3 rounded-lg font-medium border ${
+                      dailyMsg.ok
+                        ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+                        : "bg-destructive/10 text-destructive border-destructive/20"
+                    }`}
+                  >
+                    {dailyMsg.text}
+                  </div>
+                )}
+
+                <div className="flex justify-end pt-2">
+                  <Button
+                    onClick={submitDailyLog}
+                    disabled={dailySaving || (!dailyContent.trim())}
+                    className="w-full sm:w-auto"
+                  >
+                    {dailySaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {dailySaving ? "Saving..." : dailyLog ? "Update Log" : "Submit Log"}
+                  </Button>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       )}
 
       {(activeTab === "weekly" || activeTab === "monthly") && (
-        <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-gray-800">
+        <Card>
+          <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4">
+            <CardTitle className="text-lg">
               {activeTab === "weekly" ? "Weekly Summary" : "Monthly Summary"}
-            </h3>
-            <div className="flex items-center gap-2">
-              <button
+            </CardTitle>
+            <div className="flex flex-wrap items-center gap-2">
+              <Button
+                variant="outline"
+                size="icon"
                 onClick={() => setSummaryDate(prev => activeTab === "weekly" ? addDays(prev, -7) : addMonths(prev, -1))}
-                className="p-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 transition"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
-              </button>
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
               {activeTab === "weekly" ? (
-                <input
-                  type="date"
-                  value={summaryDate}
-                  onChange={(e) => setSummaryDate(e.target.value)}
-                  className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                />
+                <Popover>
+                  <PopoverTrigger render={
+                    <Button
+                      variant={"outline"}
+                      className={cn(
+                        "w-[160px] justify-start text-left font-normal",
+                        !summaryDate && "text-muted-foreground"
+                      )}
+                    />
+                  }>
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {summaryDate ? format(new Date(summaryDate), "PPP") : <span>Pick a date</span>}
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="center">
+                    <Calendar
+                      mode="single"
+                      selected={summaryDateObj}
+                      onSelect={(d) => {
+                        if (d) {
+                          const ist = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
+                          setSummaryDate(ist.toISOString().slice(0, 10));
+                        }
+                      }}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
               ) : (
-                <input
+                <Input
                   type="month"
                   value={summaryDate.slice(0, 7)}
                   onChange={(e) => setSummaryDate(e.target.value + "-01")}
-                  className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-[160px]"
                 />
               )}
-              <button
+              <Button
+                variant="outline"
+                size="icon"
                 onClick={() => setSummaryDate(prev => activeTab === "weekly" ? addDays(prev, 7) : addMonths(prev, 1))}
-                className="p-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 transition"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
-              </button>
+                <ChevronRight className="h-4 w-4" />
+              </Button>
             </div>
-          </div>
-
-          {summaryMsg && (
-            <div
-              className={`mb-4 text-sm px-4 py-2.5 rounded-lg ${
-                summaryMsg.ok
-                  ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                  : "bg-red-50 text-red-600 border border-red-200"
-              }`}
-            >
-              {summaryMsg.text}
-            </div>
-          )}
-
-          {summaryLoading ? (
-            <div className="py-12 text-center text-sm text-gray-400">Loading…</div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* AI Summary Panel */}
-              <div className="bg-gray-50 rounded-xl p-5 border border-gray-100 flex flex-col">
-                <div className="flex items-center justify-between mb-3">
-                  <h4 className="font-semibold text-gray-700 text-sm">AI Summary</h4>
-                  <button
-                    onClick={generateSummary}
-                    disabled={summaryGenerating}
-                    className="text-xs font-semibold bg-indigo-100 text-indigo-700 px-3 py-1.5 rounded-lg hover:bg-indigo-200 disabled:opacity-50 transition"
-                  >
-                    {summaryGenerating ? "Generating..." : summaryData ? "Regenerate" : "Generate"}
-                  </button>
-                </div>
-                {summaryData?.aiSummary ? (
-                  <div className="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap flex-1">
-                    {summaryData.aiSummary}
-                  </div>
-                ) : (
-                  <div className="text-sm text-gray-400 italic flex-1 flex items-center justify-center py-10">
-                    No summary generated yet.
-                  </div>
-                )}
+          </CardHeader>
+          <CardContent>
+            {summaryMsg && (
+              <div
+                className={`mb-6 text-sm px-4 py-3 rounded-lg font-medium border ${
+                  summaryMsg.ok
+                    ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+                    : "bg-destructive/10 text-destructive border-destructive/20"
+                }`}
+              >
+                {summaryMsg.text}
               </div>
+            )}
 
-              {/* Raw Logs Panel */}
-              <div className="bg-white rounded-xl p-5 border border-gray-200 h-96 overflow-y-auto">
-                <h4 className="font-semibold text-gray-700 text-sm mb-3">Raw Compiled Logs</h4>
-                {summaryData?.rawSummary ? (
-                  <pre className="text-xs text-gray-600 whitespace-pre-wrap font-sans">
-                    {summaryData.rawSummary}
-                  </pre>
-                ) : (
-                  <div className="text-sm text-gray-400 italic flex items-center justify-center py-10">
-                    No logs compiled for this period. Generate the summary to compile logs.
-                  </div>
-                )}
+            {summaryLoading ? (
+              <div className="py-12 flex justify-center items-center">
+                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                <span className="ml-2 text-sm text-muted-foreground">Loading summary...</span>
               </div>
-            </div>
-          )}
-        </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Card className="bg-muted/40 shadow-none border-muted">
+                  <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
+                    <CardTitle className="text-sm font-semibold">AI Summary</CardTitle>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={generateSummary}
+                      disabled={summaryGenerating}
+                    >
+                      {summaryGenerating && <Loader2 className="mr-2 h-3 w-3 animate-spin" />}
+                      {summaryGenerating ? "Generating..." : summaryData ? "Regenerate" : "Generate"}
+                    </Button>
+                  </CardHeader>
+                  <CardContent className="h-72 overflow-y-auto">
+                    {summaryData?.aiSummary ? (
+                      <div className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
+                        {summaryData.aiSummary}
+                      </div>
+                    ) : (
+                      <div className="h-full flex items-center justify-center text-sm text-muted-foreground italic">
+                        No summary generated yet.
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+
+                <Card className="shadow-none border-muted">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm font-semibold">Raw Compiled Logs</CardTitle>
+                  </CardHeader>
+                  <CardContent className="h-72 overflow-y-auto">
+                    {summaryData?.rawSummary ? (
+                      <pre className="text-xs text-muted-foreground whitespace-pre-wrap font-sans">
+                        {summaryData.rawSummary}
+                      </pre>
+                    ) : (
+                      <div className="h-full flex items-center justify-center text-sm text-muted-foreground italic text-center px-4">
+                        No logs compiled for this period. Generate the summary to compile logs.
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       )}
     </div>
   );
