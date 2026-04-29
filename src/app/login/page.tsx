@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -34,7 +35,14 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-md">
-        <h1 className="text-2xl font-bold text-gray-800 mb-1">Linchpin</h1>
+        <Image 
+          src="/linchpin-logo.png" 
+          alt="Linchpin Logo" 
+          width={200} 
+          height={60} 
+          className="h-auto w-auto max-h-16 mb-4"
+          priority
+        />
         <p className="text-gray-500 text-sm mb-6">Sign in to your workspace</p>
 
         {error && (
