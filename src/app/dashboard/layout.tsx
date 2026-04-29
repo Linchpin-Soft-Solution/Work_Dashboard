@@ -78,7 +78,7 @@ export default async function DashboardLayout({
   );
 
   return (
-    <div className="flex min-h-screen bg-gray-50 flex-col md:flex-row overflow-hidden w-full">
+    <div className="flex h-screen bg-gray-50 flex-col md:flex-row overflow-hidden w-full">
       <DashboardMobileNav sidebarContent={sidebarContent} />
       
       {/* Sidebar Desktop */}
