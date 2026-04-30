@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
   }
 
   if (monthParam) {
-    const date = new Date(`${monthParam}-01T00:00:00.000Z`);
+    const date = startOfMonth(new Date(`${monthParam}-01T00:00:00.000Z`));
     where.month = date;
   }
 

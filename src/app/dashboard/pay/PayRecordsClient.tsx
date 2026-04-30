@@ -334,6 +334,7 @@ function AdminView({ users }: { users: User[] }) {
   const [loading, setLoading] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [msg, setMsg] = useState<{ text: string; ok: boolean } | null>(null);
+  const [addingAdjForRecordId, setAddingAdjForRecordId] = useState<string | null>(null);
 
   const fetchRecords = useCallback(async () => {
     setLoading(true);
@@ -368,6 +369,14 @@ function AdminView({ users }: { users: User[] }) {
 
   return (
     <div className="space-y-6">
+      {addingAdjForRecordId && (
+        <AddAdjustmentDialog
+          payRecordId={addingAdjForRecordId}
+          onClose={() => setAddingAdjForRecordId(null)}
+          onSaved={(pr) => { updateRecord(pr); setAddingAdjForRecordId(null); }}
+        />
+      )}
+
       {/* Controls */}
       <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
         <h2 className="text-sm font-semibold text-gray-700 mb-4">Calculate Pay Record</h2>
@@ -438,6 +447,7 @@ function AdminView({ users }: { users: User[] }) {
                   <th className="px-5 py-3 text-right font-medium">Absent</th>
                   <th className="px-5 py-3 text-right font-medium">Base Pay</th>
                   <th className="px-5 py-3 text-right font-medium">Final Pay</th>
+                  <th className="px-5 py-3 text-center font-medium">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
@@ -453,6 +463,14 @@ function AdminView({ users }: { users: User[] }) {
                     <td className="px-5 py-3 text-right text-red-500 font-medium">{r.absentDays}</td>
                     <td className="px-5 py-3 text-right text-gray-600">{fmt(r.calculatedPay)}</td>
                     <td className="px-5 py-3 text-right font-bold text-indigo-600">{fmt(r.finalPay)}</td>
+                    <td className="px-5 py-3 text-center">
+                      <button 
+                        onClick={() => setAddingAdjForRecordId(r.id)}
+                        className="inline-flex items-center gap-1.5 text-xs font-medium text-indigo-600 hover:text-indigo-700 bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-100 hover:bg-indigo-100 transition"
+                      >
+                        <Plus className="h-3.5 w-3.5" /> Add Adj
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
