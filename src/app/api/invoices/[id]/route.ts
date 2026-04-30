@@ -2,6 +2,30 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const session = await auth();
+  if (!session || session.user.role !== "ADMIN") {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  try {
+    const { id } = await params;
+    const invoice = await prisma.invoice.findUnique({
+      where: { id },
+      include: { items: { orderBy: { sortOrder: 'asc' } } }
+    });
+
+    if (!invoice) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+    return NextResponse.json({ invoice });
+  } catch (error: any) {
+    return NextResponse.json({ error: "Failed to fetch invoice" }, { status: 500 });
+  }
+}
+
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }

@@ -126,23 +126,46 @@ model CalendarEvent {
 }
 
 model Invoice {
-  id            String        @id @default(cuid())
-  createdById   String
-  invoiceNumber String        @unique
-  clientName    String
-  clientAddress String?
-  clientGstin   String?
-  lineItems     Json
-  gstRate       Float         @default(18.0)
-  subtotal      Float         @default(0.0)
-  gstAmount     Float         @default(0.0)
-  totalAmount   Float
-  status        InvoiceStatus @default(DRAFT)
-  isQuotation   Boolean       @default(false)
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  id              String        @id @default(cuid())
+  createdById     String
+  invoiceNumber   String        @unique
+  clientName      String
+  clientEmail     String?
+  clientPhone     String?
+  clientAddress   String?
+  clientGstin     String?
+  projectName     String?
+  issueDate       DateTime      @default(now())
+  dueDate         DateTime?
+  
+  subtotal        Int           @default(0) // Stored in paise
+  gstAmount       Int           @default(0) // Stored in paise
+  discountPercent Float         @default(0.0)
+  discountAmount  Int           @default(0) // Stored in paise
+  totalAmount     Int           @default(0) // Stored in paise
+  
+  notes           String?
+  status          InvoiceStatus @default(DRAFT)
+  isQuotation     Boolean       @default(false)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 
-  User User @relation(fields: [createdById], references: [id])
+  User            User          @relation(fields: [createdById], references: [id])
+  items           InvoiceItem[]
+}
+
+model InvoiceItem {
+  id          String   @id @default(cuid())
+  invoiceId   String
+  name        String
+  description String?
+  category    String
+  qty         Int      @default(1)
+  rate        Int      // Stored in paise
+  gstPercent  Float    @default(18.0)
+  sortOrder   Int      @default(0)
+
+  Invoice     Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
 }
 
 model PayRecord {
@@ -212,6 +235,7 @@ enum InvoiceStatus {
   DRAFT
   SENT
   PAID
+  CANCELLED
 }
 
 enum AdjustmentType {

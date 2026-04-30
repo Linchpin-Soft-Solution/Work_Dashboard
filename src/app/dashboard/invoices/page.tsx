@@ -12,13 +12,22 @@ export default async function InvoicesPage() {
 
   const invoices = await prisma.invoice.findMany({
     orderBy: { createdAt: "desc" },
-    include: { User: { select: { name: true } } },
+    include: { 
+      User: { select: { name: true } },
+      items: true 
+    },
   });
 
   const companyDetails = {
-    name: process.env.COMPANY_NAME || "Linchpin Soft Solution",
-    address: process.env.COMPANY_ADDRESS || "Begumpet Hyderabad",
-    gstin: process.env.COMPANY_GSTIN || "",
+    name: "Linchpin Soft Solution",
+    tagline: "Digital Marketing & Creative Studio",
+    address: "123, Tech Park, Sector 18, Noida - 201301",
+    email: "contact@linchpinsoft.com",
+    phone: "+91 98765 43210",
+    gstin: "09XXXXX0000X1Z5",
+    bank: "HDFC Bank",
+    ifsc: "HDFC0001234",
+    upi: "linchpin@hdfcbank",
   };
 
   return <InvoicesClient initialInvoices={invoices} companyDetails={companyDetails} />;
