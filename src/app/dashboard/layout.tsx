@@ -6,6 +6,7 @@ import SidebarNav from "@/components/SidebarNav";
 import DashboardMobileNav from "@/components/DashboardMobileNav";
 
 const adminLinks = [
+  { href: "/dashboard", label: "Dashboard" },
   { href: "/dashboard/attendance", label: "Attendance" },
   { href: "/dashboard/logs", label: "Daily Logs" },
   { href: "/dashboard/targets", label: "Targets" },
@@ -18,6 +19,7 @@ const adminLinks = [
 ];
 
 const employeeLinks = [
+  { href: "/dashboard", label: "Dashboard" },
   { href: "/dashboard/attendance", label: "Attendance" },
   { href: "/dashboard/logs", label: "Daily Logs" },
   { href: "/dashboard/targets", label: "Targets" },

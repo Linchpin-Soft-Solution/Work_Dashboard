@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/u
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { ChevronLeft, ChevronRight, PlusIcon, Loader2, Pencil, Trash2, Globe, Lock, CalendarIcon } from "lucide-react";
+import { ChevronLeft, ChevronRight, PlusIcon, Loader2, Pencil, Trash2, Globe, Lock, CalendarIcon, Target } from "lucide-react";
 
 interface CalendarEvent {
   id: string;
@@ -22,6 +22,9 @@ interface CalendarEvent {
   isPrivate: boolean;
   isCompanyWide: boolean;
   User: { id: string; name: string };
+  isTarget?: boolean;
+  targetPriority?: string;
+  targetStatus?: string;
 }
 
 interface Props {
@@ -117,6 +120,7 @@ export default function CalendarClient({ session, users }: Props) {
   };
 
   const canEditEvent = (ev: CalendarEvent) => {
+    if (ev.isTarget) return false;
     if (ev.userId === session.user.id) return true;
     if (isAdmin && !ev.isPrivate) return true;
     return false;
@@ -260,7 +264,9 @@ export default function CalendarClient({ session, users }: Props) {
                               <div
                                 key={ev.id}
                                 className={`text-[10px] sm:text-xs leading-tight truncate rounded px-1 py-0.5 ${
-                                  ev.isCompanyWide
+                                  ev.isTarget
+                                    ? "bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300"
+                                    : ev.isCompanyWide
                                     ? "bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300"
                                     : ev.isPrivate
                                     ? "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
@@ -307,13 +313,15 @@ export default function CalendarClient({ session, users }: Props) {
               <div className="space-y-3">
                 {detailEvents.map(ev => (
                   <div key={ev.id} className={`flex items-start justify-between gap-4 p-3 rounded-lg border ${
-                    ev.isCompanyWide ? "border-violet-200 bg-violet-50/50 dark:border-violet-800 dark:bg-violet-950/20"
+                    ev.isTarget ? "border-rose-200 bg-rose-50/50 dark:border-rose-800 dark:bg-rose-950/20"
+                    : ev.isCompanyWide ? "border-violet-200 bg-violet-50/50 dark:border-violet-800 dark:bg-violet-950/20"
                     : ev.isPrivate ? "border-amber-200 bg-amber-50/50 dark:border-amber-800 dark:bg-amber-950/20"
                     : "border-sky-200 bg-sky-50/50 dark:border-sky-800 dark:bg-sky-950/20"
                   }`}>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
                         <span className="font-medium text-foreground">{ev.title}</span>
+                        {ev.isTarget && <Badge variant="secondary" className="text-[10px] gap-1 bg-rose-100 text-rose-700 hover:bg-rose-100 border-rose-200"><Target className="h-3 w-3" />Target Due</Badge>}
                         {ev.isCompanyWide && <Badge variant="secondary" className="text-[10px] gap-1"><Globe className="h-3 w-3" />Company</Badge>}
                         {ev.isPrivate && <Badge variant="outline" className="text-[10px] gap-1"><Lock className="h-3 w-3" />Private</Badge>}
                       </div>
@@ -343,6 +351,7 @@ export default function CalendarClient({ session, users }: Props) {
 
       {/* Legend */}
       <div className="flex flex-wrap gap-4 text-xs text-muted-foreground px-1">
+        <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-rose-200 dark:bg-rose-800 inline-block" /> Target Due</div>
         <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-violet-200 dark:bg-violet-800 inline-block" /> Company-wide</div>
         <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-sky-200 dark:bg-sky-800 inline-block" /> Shared</div>
         <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-amber-200 dark:bg-amber-800 inline-block" /> Private</div>

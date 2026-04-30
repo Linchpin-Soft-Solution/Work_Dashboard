@@ -20,7 +20,7 @@ Summary:`;
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      model: "google/gemma-3-12b-it:free",
+      model: "openrouter/free",
       messages: [
         { role: "user", content: prompt }
       ]
@@ -63,7 +63,7 @@ Daily Report:`;
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      model: "mistralai/mistral-7b-instruct-v0.1",
+      model: "openrouter/free",
       messages: [
         { role: "user", content: prompt }
       ]

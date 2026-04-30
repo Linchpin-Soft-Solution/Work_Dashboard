@@ -32,6 +32,7 @@ export async function GET(req: NextRequest) {
 
   // User-specific events
   let userEvents: any[] = [];
+  let userTargets: any[] = [];
 
   if (isAdmin && targetUserId && targetUserId !== currentUserId) {
     // Admin viewing another employee's calendar — only non-private events
@@ -47,6 +48,17 @@ export async function GET(req: NextRequest) {
       include: { User: { select: { id: true, name: true } } },
       orderBy: { startTime: "asc" },
     });
+
+    const targetWhere: any = {
+      assignedToId: targetUserId,
+      dueDate: { not: null }
+    };
+    if (start || end) targetWhere.dueDate = dateFilter;
+
+    userTargets = await prisma.target.findMany({
+      where: targetWhere,
+      include: { User_Target_assignedToIdToUser: { select: { id: true, name: true } } }
+    });
   } else {
     // User viewing their own calendar — all events
     const viewUserId = isAdmin && targetUserId ? targetUserId : currentUserId;
@@ -61,12 +73,39 @@ export async function GET(req: NextRequest) {
       include: { User: { select: { id: true, name: true } } },
       orderBy: { startTime: "asc" },
     });
+
+    const targetWhere: any = {
+      assignedToId: viewUserId,
+      dueDate: { not: null }
+    };
+    if (start || end) targetWhere.dueDate = dateFilter;
+
+    userTargets = await prisma.target.findMany({
+      where: targetWhere,
+      include: { User_Target_assignedToIdToUser: { select: { id: true, name: true } } }
+    });
   }
+
+  const targetEvents = userTargets.map(t => ({
+    id: "target_" + t.id,
+    userId: t.assignedToId,
+    title: t.title,
+    description: t.description || null,
+    startTime: t.dueDate!.toISOString(),
+    endTime: t.dueDate!.toISOString(),
+    isPrivate: false,
+    isCompanyWide: false,
+    User: t.User_Target_assignedToIdToUser,
+    isTarget: true,
+    targetPriority: t.priority,
+    targetStatus: t.status
+  }));
 
   // Merge & deduplicate (company events may already include user's company events)
   const allMap = new Map<string, any>();
   for (const e of companyEvents) allMap.set(e.id, e);
   for (const e of userEvents) allMap.set(e.id, e);
+  for (const t of targetEvents) allMap.set(t.id, t);
 
   const events = Array.from(allMap.values()).sort(
     (a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
