@@ -294,7 +294,9 @@ export default function TargetsClient({
         <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
           <Select value={filterUser} onValueChange={setFilterUser}>
             <SelectTrigger className="w-full sm:w-[180px]">
-              <SelectValue placeholder="All Employees" />
+              <SelectValue placeholder="All Employees">
+                {filterUser === "all" ? "All Employees" : users.find(u => u.id === filterUser)?.name}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Employees</SelectItem>
@@ -410,7 +412,9 @@ export default function TargetsClient({
                 <Label>Assign To <span className="text-destructive">*</span></Label>
                 <Select value={formData.assignedToId} onValueChange={val => setFormData({ ...formData, assignedToId: val })}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select Employee" />
+                    <SelectValue placeholder="Select Employee">
+                      {users.find(u => u.id === formData.assignedToId)?.name || "Select Employee"}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {users.map(u => <SelectItem key={u.id} value={u.id}>{u.name}</SelectItem>)}

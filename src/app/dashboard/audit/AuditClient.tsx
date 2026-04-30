@@ -96,7 +96,9 @@ export default function AuditClient({ initialLogs, users }: Props) {
           <div className="flex gap-2 w-full sm:w-auto">
             <Select value={actionFilter} onValueChange={(val) => { if (val) setActionFilter(val); }}>
               <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Action Type" />
+                <SelectValue placeholder="Action Type">
+                  {actionFilter === "ALL" ? "All Actions" : formatActionType(actionFilter)}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="ALL">All Actions</SelectItem>
@@ -108,7 +110,9 @@ export default function AuditClient({ initialLogs, users }: Props) {
 
             <Select value={employeeFilter} onValueChange={(val) => { if (val) setEmployeeFilter(val); }}>
               <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Employee" />
+                <SelectValue placeholder="Employee">
+                  {employeeFilter === "ALL" ? "All Employees" : users.find(u => u.id === employeeFilter)?.name}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="ALL">All Employees</SelectItem>
