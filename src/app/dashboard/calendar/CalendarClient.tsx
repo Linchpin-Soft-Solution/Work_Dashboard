@@ -184,7 +184,7 @@ export default function CalendarClient({ session, users }: Props) {
         </div>
         <div className="flex items-center gap-3 flex-wrap">
           {isAdmin && (
-            <Select value={selectedUserId} onValueChange={setSelectedUserId}>
+            <Select value={selectedUserId} onValueChange={(val) => setSelectedUserId(val || "mine")}>
               <SelectTrigger className="w-[200px]">
                 {selectedUserId === "mine"
                   ? "My Calendar"

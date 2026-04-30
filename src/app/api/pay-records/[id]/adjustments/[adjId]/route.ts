@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function DELETE(
   _req: NextRequest,
-  { params }: { params: { id: string; adjId: string } }
+  { params }: { params: Promise<{ id: string; adjId: string }> }
 ) {
   const session = await auth();
   if (!session || session.user.role !== "ADMIN") {
@@ -12,22 +12,23 @@ export async function DELETE(
   }
 
   try {
+    const { id, adjId } = await params;
     const adjustment = await prisma.payAdjustment.findUnique({
-      where: { id: params.adjId },
+      where: { id: adjId },
     });
 
-    if (!adjustment || adjustment.payRecordId !== params.id) {
+    if (!adjustment || adjustment.payRecordId !== id) {
       return NextResponse.json({ error: "Adjustment not found" }, { status: 404 });
     }
 
-    await prisma.payAdjustment.delete({ where: { id: params.adjId } });
+    await prisma.payAdjustment.delete({ where: { id: adjId } });
 
     // Revert finalPay on parent record
     const adjustmentValue =
       adjustment.type === "DEDUCTION" ? adjustment.amount : -adjustment.amount;
 
     const updated = await prisma.payRecord.update({
-      where: { id: params.id },
+      where: { id },
       data: { finalPay: { increment: adjustmentValue } },
       include: {
         User: { select: { id: true, name: true, designation: true } },
