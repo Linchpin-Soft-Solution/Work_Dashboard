@@ -236,7 +236,7 @@ export default function TargetsClient({
             <h3 className="font-semibold text-foreground mb-4 px-1">{col.title}</h3>
             <div className="space-y-4">
               {targets.filter(t => col.statuses.includes(t.status)).map(t => {
-                const isOverdue = t.status === "OVERDUE" || (t.status !== "COMPLETED" && t.dueDate && new Date(t.dueDate) < new Date());
+                const isOverdue = t.status === "OVERDUE" || (t.status !== "COMPLETED" && t.dueDate && new Date(t.dueDate).setHours(23, 59, 59, 999) < new Date().getTime());
                 return (
                   <Card 
                     key={t.id} 
@@ -337,7 +337,10 @@ export default function TargetsClient({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {targets.map(t => (
+                {targets.map(t => {
+                  const isOverdue = t.status === "OVERDUE" || (t.status !== "COMPLETED" && t.dueDate && new Date(t.dueDate).setHours(23, 59, 59, 999) < new Date().getTime());
+                  const displayStatus = isOverdue ? "OVERDUE" : t.status;
+                  return (
                   <TableRow key={t.id}>
                     <TableCell>
                       <div className="font-medium">{t.title}</div>
@@ -346,7 +349,7 @@ export default function TargetsClient({
                     <TableCell>{t.User_Target_assignedToIdToUser.name}</TableCell>
                     <TableCell><PriorityBadge priority={t.priority} /></TableCell>
                     <TableCell>{t.dueDate ? new Date(t.dueDate).toLocaleDateString() : "—"}</TableCell>
-                    <TableCell><StatusBadge status={t.status} /></TableCell>
+                    <TableCell><StatusBadge status={displayStatus} /></TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
                         <Button variant="ghost" size="icon" onClick={() => openEditModal(t)}>
@@ -358,7 +361,8 @@ export default function TargetsClient({
                       </div>
                     </TableCell>
                   </TableRow>
-                ))}
+                  );
+                })}
               </TableBody>
             </Table>
           </div>
