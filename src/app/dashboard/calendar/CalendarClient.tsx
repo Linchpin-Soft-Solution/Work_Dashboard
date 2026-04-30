@@ -3,6 +3,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
+import { useConfirm } from "@/hooks/use-confirm";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
@@ -56,6 +58,7 @@ export default function CalendarClient({ session, users }: Props) {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<string>("mine");
+  const { confirm, ConfirmDialog } = useConfirm();
 
   // Modal
   const [modalOpen, setModalOpen] = useState(false);
@@ -142,10 +145,11 @@ export default function CalendarClient({ session, users }: Props) {
   };
 
   const deleteEvent = async (id: string) => {
-    if (!confirm("Delete this event?")) return;
+    const ok = await confirm("Delete Event", "Are you sure you want to delete this event?");
+    if (!ok) return;
     const res = await fetch(`/api/calendar/${id}`, { method: "DELETE" });
     if (res.ok) fetchEvents();
-    else alert("Failed to delete event.");
+    else toast.error("Failed to delete event.");
   };
 
   // Build calendar grid
@@ -409,6 +413,7 @@ export default function CalendarClient({ session, users }: Props) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      <ConfirmDialog />
     </div>
   );
 }

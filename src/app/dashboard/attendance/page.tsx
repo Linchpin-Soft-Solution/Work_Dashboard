@@ -8,6 +8,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { useConfirm } from "@/hooks/use-confirm";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface AttendanceRecord {
@@ -572,6 +573,7 @@ function AdminView() {
   const [overrideTarget, setOverrideTarget] = useState<AdminRecord | null>(null);
   const [holidayLoading, setHolidayLoading] = useState(false);
   const [holidayMsg, setHolidayMsg] = useState<string | null>(null);
+  const { confirm, ConfirmDialog } = useConfirm();
 
   const fetchRecords = useCallback(async () => {
     setLoading(true);
@@ -586,7 +588,8 @@ function AdminView() {
   }, [fetchRecords]);
 
   async function markHoliday() {
-    if (!confirm(`Mark ${date} as a company holiday for all employees?`)) return;
+    const ok = await confirm("Mark Holiday", `Mark ${date} as a company holiday for all employees?`);
+    if (!ok) return;
     setHolidayLoading(true);
     setHolidayMsg(null);
     const res = await fetch("/api/attendance/override", {
@@ -775,6 +778,7 @@ function AdminView() {
           </div>
         )}
       </div>
+      <ConfirmDialog />
     </div>
   );
 }

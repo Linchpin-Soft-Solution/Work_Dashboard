@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Session } from "next-auth";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { useConfirm } from "@/hooks/use-confirm";
 import { CalendarIcon, ChevronLeft, ChevronRight, Plus, Trash2, Download } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -177,9 +178,11 @@ function PayRecordCard({ record, isAdmin, onUpdated }: {
 }) {
   const [showAddAdj, setShowAddAdj] = useState(false);
   const [deletingAdj, setDeletingAdj] = useState<string | null>(null);
+  const { confirm, ConfirmDialog } = useConfirm();
 
   async function deleteAdj(adjId: string) {
-    if (!confirm("Remove this adjustment?")) return;
+    const ok = await confirm("Remove Adjustment", "Remove this adjustment?");
+    if (!ok) return;
     setDeletingAdj(adjId);
     const res = await fetch(`/api/pay-records/${record.id}/adjustments/${adjId}`, { method: "DELETE" });
     const data = await res.json();
@@ -292,6 +295,7 @@ function PayRecordCard({ record, isAdmin, onUpdated }: {
           </div>
         )}
       </div>
+      <ConfirmDialog />
     </div>
   );
 }

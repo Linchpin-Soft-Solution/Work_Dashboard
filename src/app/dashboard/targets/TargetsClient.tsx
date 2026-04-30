@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
+import { useConfirm } from "@/hooks/use-confirm";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { ClockIcon, EditIcon, PlusIcon, TrashIcon, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 // --- Types ---
 type TargetPriority = "HIGH" | "MEDIUM" | "LOW";
@@ -66,6 +68,7 @@ export default function TargetsClient({
   
   const [targets, setTargets] = useState<Target[]>([]);
   const [loading, setLoading] = useState(false);
+  const { confirm, ConfirmDialog } = useConfirm();
 
   // Filters
   const [filterUser, setFilterUser] = useState<string>("all");
@@ -170,13 +173,14 @@ export default function TargetsClient({
   };
 
   const deleteTarget = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this target?")) return;
+    const ok = await confirm("Delete Target", "Are you sure you want to delete this target?");
+    if (!ok) return;
     
     const res = await fetch(`/api/targets/${id}`, { method: "DELETE" });
     if (res.ok) {
       fetchTargets();
     } else {
-      alert("Failed to delete target.");
+      toast.error("Failed to delete target.");
     }
   };
 
@@ -211,7 +215,7 @@ export default function TargetsClient({
     
     if (!res.ok) {
       setTargets(prevTargets);
-      alert("Failed to update status.");
+      toast.error("Failed to update status.");
     } else {
       fetchTargets();
     }
@@ -507,6 +511,7 @@ export default function TargetsClient({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      <ConfirmDialog />
     </div>
   );
 }

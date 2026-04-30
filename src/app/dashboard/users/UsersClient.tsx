@@ -5,6 +5,8 @@ import { User } from "@prisma/client";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
+import { useConfirm } from "@/hooks/use-confirm";
 import { Label } from "@/components/ui/label";
 import {
   Table,
@@ -46,6 +48,7 @@ export default function UsersClient({ initialUsers, currentUserId }: UsersClient
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { confirm, ConfirmDialog } = useConfirm();
 
   const handleAddSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -76,10 +79,10 @@ export default function UsersClient({ initialUsers, currentUserId }: UsersClient
       const newUser = await res.json();
       setUsers([...users, newUser]);
       setIsAddOpen(false);
-      alert("User created successfully");
+      toast.success("User created successfully");
       router.refresh();
     } catch (error: any) {
-      alert(`Error: ${error.message}`);
+      toast.error(`Error: ${error.message}`);
     } finally {
       setIsLoading(false);
     }
@@ -117,17 +120,21 @@ export default function UsersClient({ initialUsers, currentUserId }: UsersClient
       setUsers(users.map((u) => (u.id === updatedUser.id ? updatedUser : u)));
       setIsEditOpen(false);
       setSelectedUser(null);
-      alert("User updated successfully");
+      toast.success("User updated successfully");
       router.refresh();
     } catch (error: any) {
-      alert(`Error: ${error.message}`);
+      toast.error(`Error: ${error.message}`);
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to deactivate this user? They will no longer be able to log in, but their data will be preserved.")) return;
+    const ok = await confirm(
+      "Deactivate User",
+      "Are you sure you want to deactivate this user? They will no longer be able to log in, but their data will be preserved."
+    );
+    if (!ok) return;
 
     try {
       const res = await fetch(`/api/users/${id}`, {
@@ -138,10 +145,10 @@ export default function UsersClient({ initialUsers, currentUserId }: UsersClient
 
       const deactivatedUser = await res.json();
       setUsers(users.map((u) => (u.id === deactivatedUser.id ? deactivatedUser : u)));
-      alert("User deactivated successfully");
+      toast.success("User deactivated successfully");
       router.refresh();
     } catch (error: any) {
-      alert(`Error: ${error.message}`);
+      toast.error(`Error: ${error.message}`);
     }
   };
 
@@ -340,6 +347,7 @@ export default function UsersClient({ initialUsers, currentUserId }: UsersClient
           )}
         </DialogContent>
       </Dialog>
+      <ConfirmDialog />
     </div>
   );
 }

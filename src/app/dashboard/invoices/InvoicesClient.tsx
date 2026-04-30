@@ -4,6 +4,8 @@ import { useState, useMemo } from "react";
 import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
+import { useConfirm } from "@/hooks/use-confirm";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -47,6 +49,7 @@ export default function InvoicesClient({ initialInvoices, companyDetails }: Prop
   const [invoices, setInvoices] = useState<Invoice[]>(initialInvoices);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { confirm, ConfirmDialog } = useConfirm();
   
   // Form State
   const [isQuotation, setIsQuotation] = useState(false);
@@ -93,8 +96,8 @@ export default function InvoicesClient({ initialInvoices, companyDetails }: Prop
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!clientName) return alert("Client name is required");
-    if (lineItems.some(i => !i.description)) return alert("All line items must have a description");
+    if (!clientName) { toast.error("Client name is required"); return; }
+    if (lineItems.some(i => !i.description)) { toast.error("All line items must have a description"); return; }
     
     setLoading(true);
     const res = await fetch("/api/invoices", {
@@ -121,7 +124,7 @@ export default function InvoicesClient({ initialInvoices, companyDetails }: Prop
       setIsAddOpen(false);
       resetForm();
     } else {
-      alert(data.error);
+      toast.error(data.error || "Failed to save document");
     }
   };
 
@@ -137,7 +140,8 @@ export default function InvoicesClient({ initialInvoices, companyDetails }: Prop
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Delete this document?")) return;
+    const ok = await confirm("Delete Document", "Are you sure you want to delete this document?");
+    if (!ok) return;
     const res = await fetch(`/api/invoices/${id}`, { method: "DELETE" });
     if (res.ok) {
       setInvoices(invoices.filter(inv => inv.id !== id));
@@ -335,6 +339,7 @@ export default function InvoicesClient({ initialInvoices, companyDetails }: Prop
           </form>
         </DialogContent>
       </Dialog>
+      <ConfirmDialog />
     </div>
   );
 }
