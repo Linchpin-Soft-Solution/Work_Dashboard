@@ -193,7 +193,7 @@ export default function LogsClient({
         {isAdmin && (
           <div className="w-full md:w-64">
             <Label className="sr-only">Select Employee</Label>
-            <Select value={selectedUserId} onValueChange={setSelectedUserId}>
+            <Select value={selectedUserId} onValueChange={(val) => { if (val) setSelectedUserId(val); }}>
               <SelectTrigger>
                 <SelectValue placeholder="Select an employee">
                   {users.find(u => u.id === selectedUserId)?.name || "Select an employee"}

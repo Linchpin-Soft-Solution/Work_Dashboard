@@ -296,7 +296,7 @@ export default function TargetsClient({
       <CardHeader className="p-4 border-b border-border flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <CardTitle className="text-lg">All Targets</CardTitle>
         <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-          <Select value={filterUser} onValueChange={setFilterUser}>
+          <Select value={filterUser} onValueChange={(val) => { if (val) setFilterUser(val); }}>
             <SelectTrigger className="w-full sm:w-[180px]">
               <SelectValue placeholder="All Employees">
                 {filterUser === "all" ? "All Employees" : users.find(u => u.id === filterUser)?.name}
@@ -307,7 +307,7 @@ export default function TargetsClient({
               {users.map(u => <SelectItem key={u.id} value={u.id}>{u.name}</SelectItem>)}
             </SelectContent>
           </Select>
-          <Select value={filterStatus} onValueChange={setFilterStatus}>
+          <Select value={filterStatus} onValueChange={(val) => { if (val) setFilterStatus(val); }}>
             <SelectTrigger className="w-full sm:w-[180px]">
               <SelectValue placeholder="All Statuses" />
             </SelectTrigger>
@@ -414,7 +414,7 @@ export default function TargetsClient({
             {isAdmin && (
               <div className="grid gap-2">
                 <Label>Assign To <span className="text-destructive">*</span></Label>
-                <Select value={formData.assignedToId} onValueChange={val => setFormData({ ...formData, assignedToId: val })}>
+                <Select value={formData.assignedToId} onValueChange={val => { if (val) setFormData({ ...formData, assignedToId: val }); }}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select Employee">
                       {users.find(u => u.id === formData.assignedToId)?.name || "Select Employee"}
@@ -430,7 +430,7 @@ export default function TargetsClient({
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
                 <Label>Priority</Label>
-                <Select value={formData.priority} onValueChange={val => setFormData({ ...formData, priority: val as TargetPriority })}>
+                <Select value={formData.priority} onValueChange={val => { if (val) setFormData({ ...formData, priority: val as TargetPriority }); }}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -443,7 +443,7 @@ export default function TargetsClient({
               </div>
               <div className="grid gap-2">
                 <Label>Timeframe</Label>
-                <Select value={formData.timeframe} onValueChange={val => setFormData({ ...formData, timeframe: val as TargetTimeframe })}>
+                <Select value={formData.timeframe} onValueChange={val => { if (val) setFormData({ ...formData, timeframe: val as TargetTimeframe }); }}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -469,7 +469,7 @@ export default function TargetsClient({
               {editingTarget && isAdmin && (
                 <div className="grid gap-2">
                   <Label>Status</Label>
-                  <Select value={formData.status} onValueChange={val => setFormData({ ...formData, status: val as TargetStatus })}>
+                  <Select value={formData.status} onValueChange={val => { if (val) setFormData({ ...formData, status: val as TargetStatus }); }}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>

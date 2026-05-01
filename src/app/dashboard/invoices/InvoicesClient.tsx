@@ -44,8 +44,8 @@ interface Invoice {
   totalAmount: number;
   status: string;
   isQuotation: boolean;
-  createdAt: string;
-  issueDate?: string;
+  createdAt: any;
+  issueDate?: any;
   [key: string]: any;
 }
 
@@ -310,7 +310,7 @@ export default function InvoicesClient({ initialInvoices, companyDetails }: Prop
                             </div>
                           </TableCell>
                           <TableCell className="p-2 align-top">
-                             <Select value={item.category} onValueChange={(val) => updateItem(index, 'category', val)}>
+                             <Select value={item.category} onValueChange={(val) => { if (val) updateItem(index, 'category', val); }}>
                                 <SelectTrigger className="h-8 border-transparent hover:border-input text-xs px-2"><SelectValue /></SelectTrigger>
                                 <SelectContent>
                                   {Array.from(new Set([...QUICK_SERVICES.map(s=>s.category), "General"])).map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
@@ -324,7 +324,7 @@ export default function InvoicesClient({ initialInvoices, companyDetails }: Prop
                             <Input type="number" min="0" step="1" required value={item.rate} onChange={e => updateItem(index, 'rate', parseFloat(e.target.value)||0)} className="h-8 border-transparent hover:border-input focus:border-input bg-transparent" />
                           </TableCell>
                           <TableCell className="p-2 align-top">
-                            <Select value={item.gstPercent.toString()} onValueChange={(val) => updateItem(index, 'gstPercent', parseFloat(val))}>
+                            <Select value={item.gstPercent.toString()} onValueChange={(val) => { if (val) updateItem(index, 'gstPercent', parseFloat(val)); }}>
                                 <SelectTrigger className="h-8 border-transparent hover:border-input text-xs px-2"><SelectValue /></SelectTrigger>
                                 <SelectContent>
                                   {[0, 5, 12, 18, 28].map(r => <SelectItem key={r} value={r.toString()}>{r}%</SelectItem>)}
@@ -474,7 +474,7 @@ export default function InvoicesClient({ initialInvoices, companyDetails }: Prop
             className="pl-9 bg-muted/50 border-transparent focus-visible:bg-white"
           />
         </div>
-        <Select value={typeFilter} onValueChange={setTypeFilter}>
+        <Select value={typeFilter} onValueChange={(val) => { if (val) setTypeFilter(val); }}>
           <SelectTrigger className="w-[160px] bg-muted/50 border-transparent focus:bg-white"><SelectValue placeholder="Document Type" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="ALL">All Types</SelectItem>
@@ -482,7 +482,7 @@ export default function InvoicesClient({ initialInvoices, companyDetails }: Prop
             <SelectItem value="QUOTATION">Quotations</SelectItem>
           </SelectContent>
         </Select>
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
+        <Select value={statusFilter} onValueChange={(val) => { if (val) setStatusFilter(val); }}>
           <SelectTrigger className="w-[160px] bg-muted/50 border-transparent focus:bg-white"><SelectValue placeholder="Status" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="ALL">All Statuses</SelectItem>

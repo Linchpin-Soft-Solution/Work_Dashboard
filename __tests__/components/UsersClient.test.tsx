@@ -26,7 +26,7 @@ const mockUsers = [
   {
     id: "1",
     name: "John Doe",
-    email: "john@example.com",
+    email: "john@linchpinsoftsolution.com",
     role: "ADMIN",
     isActive: true,
     baseMonthlySalary: 50000,
@@ -49,7 +49,7 @@ describe("UsersClient Component", () => {
     render(<UsersClient initialUsers={mockUsers} currentUserId="admin-1" />)
     
     expect(screen.getByText("John Doe")).toBeInTheDocument()
-    expect(screen.getByText("john@example.com")).toBeInTheDocument()
+    expect(screen.getByText("john@linchpinsoftsolution.com")).toBeInTheDocument()
     expect(screen.getByText("ADMIN")).toBeInTheDocument()
     expect(screen.getByText("Active")).toBeInTheDocument()
   })
@@ -65,7 +65,7 @@ describe("UsersClient Component", () => {
   })
 
   it("successfully creates a new user", async () => {
-    const newUser = { ...mockUsers[0], id: "2", name: "Jane Smith", email: "jane@example.com" }
+    const newUser = { ...mockUsers[0], id: "2", name: "Jane Smith", email: "jane@linchpinsoftsolution.com" }
     ;(global.fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,
       json: async () => newUser,
@@ -78,7 +78,7 @@ describe("UsersClient Component", () => {
     
     // Fill form
     fireEvent.change(screen.getByLabelText("Full Name"), { target: { value: "Jane Smith" } })
-    fireEvent.change(screen.getByLabelText("Email Address"), { target: { value: "jane@example.com" } })
+    fireEvent.change(screen.getByLabelText("Email Address"), { target: { value: "jane@linchpinsoftsolution.com" } })
     fireEvent.change(screen.getByLabelText("Password"), { target: { value: "password123" } })
     
     // Submit
@@ -102,7 +102,7 @@ describe("UsersClient Component", () => {
     
     fireEvent.click(screen.getByText("Add User"))
     fireEvent.change(screen.getByLabelText("Full Name"), { target: { value: "Jane Smith" } })
-    fireEvent.change(screen.getByLabelText("Email Address"), { target: { value: "jane@example.com" } })
+    fireEvent.change(screen.getByLabelText("Email Address"), { target: { value: "jane@linchpinsoftsolution.com" } })
     fireEvent.change(screen.getByLabelText("Password"), { target: { value: "password123" } })
     
     fireEvent.click(screen.getByText("Create User"))
