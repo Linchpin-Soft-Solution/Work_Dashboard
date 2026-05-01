@@ -4,6 +4,7 @@ import { signOut } from "@/auth";
 import Image from "next/image";
 import SidebarNav from "@/components/SidebarNav";
 import DashboardMobileNav from "@/components/DashboardMobileNav";
+import ChangePasswordDialog from "@/components/ChangePasswordDialog";
 
 const adminLinks = [
   { href: "/dashboard", label: "Dashboard" },
@@ -62,6 +63,7 @@ export default async function DashboardLayout({
       <SidebarNav links={links} />
 
       <div className="px-3 py-4 border-t border-gray-100 mt-auto">
+        <ChangePasswordDialog />
         <form
           action={async () => {
             "use server";
