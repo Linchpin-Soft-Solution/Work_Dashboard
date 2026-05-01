@@ -1,10 +1,10 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
-import { signOut } from "@/auth";
 import Image from "next/image";
 import SidebarNav from "@/components/SidebarNav";
 import DashboardMobileNav from "@/components/DashboardMobileNav";
 import ChangePasswordDialog from "@/components/ChangePasswordDialog";
+import SignOutDialog from "@/components/SignOutDialog";
 
 const adminLinks = [
   { href: "/dashboard", label: "Dashboard" },
@@ -64,19 +64,7 @@ export default async function DashboardLayout({
 
       <div className="px-3 py-4 border-t border-gray-100 mt-auto">
         <ChangePasswordDialog />
-        <form
-          action={async () => {
-            "use server";
-            await signOut({ redirectTo: "/login" });
-          }}
-        >
-          <button
-            type="submit"
-            className="w-full text-left px-3 py-2 rounded-lg text-sm text-red-500 hover:bg-red-50 transition"
-          >
-            Sign out
-          </button>
-        </form>
+        <SignOutDialog />
       </div>
     </>
   );

@@ -62,13 +62,13 @@ export default function ChangePasswordDialog() {
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <button
-          className="w-full text-left px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition flex items-center gap-2 mb-1"
-        >
-          <Lock className="h-4 w-4" />
-          Change Password
-        </button>
+      <DialogTrigger
+        render={
+          <button className="w-full text-left px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition flex items-center gap-2 mb-1" />
+        }
+      >
+        <Lock className="h-4 w-4" />
+        Change Password
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
