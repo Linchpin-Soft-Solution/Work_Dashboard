@@ -14,6 +14,10 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     const body = await req.json();
     const { name, email, role, designation, baseMonthlySalary, isActive, password } = body;
 
+    if (email && !email.endsWith("@linchpinsoftsolution.com")) {
+      return NextResponse.json({ error: "Email must be a @linchpinsoftsolution.com address" }, { status: 400 });
+    }
+
     const dataToUpdate: any = {
       name,
       email,

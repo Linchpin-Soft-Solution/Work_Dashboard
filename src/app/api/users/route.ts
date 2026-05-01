@@ -35,6 +35,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Name and email are required" }, { status: 400 });
     }
 
+    if (!email.endsWith("@linchpinsoftsolution.com")) {
+      return NextResponse.json({ error: "Email must be a @linchpinsoftsolution.com address" }, { status: 400 });
+    }
+
     // Check if user exists
     const existingUser = await prisma.user.findUnique({
       where: { email },

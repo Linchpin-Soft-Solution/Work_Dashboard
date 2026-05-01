@@ -57,12 +57,18 @@ export default function UsersClient({ initialUsers, currentUserId }: UsersClient
     const formData = new FormData(e.currentTarget);
     const data = {
       name: formData.get("name"),
-      email: formData.get("email"),
+      email: formData.get("email") as string,
       password: formData.get("password") || undefined,
       role: formData.get("role"),
       designation: formData.get("designation"),
       baseMonthlySalary: formData.get("baseMonthlySalary"),
     };
+
+    if (!data.email.endsWith("@linchpinsoftsolution.com")) {
+      toast.error("Email must be a @linchpinsoftsolution.com address");
+      setIsLoading(false);
+      return;
+    }
 
     try {
       const res = await fetch("/api/users", {
@@ -96,13 +102,19 @@ export default function UsersClient({ initialUsers, currentUserId }: UsersClient
     const formData = new FormData(e.currentTarget);
     const data = {
       name: formData.get("name"),
-      email: formData.get("email"),
+      email: formData.get("email") as string,
       password: formData.get("password") || undefined,
       role: formData.get("role"),
       designation: formData.get("designation"),
       baseMonthlySalary: formData.get("baseMonthlySalary"),
       isActive: formData.get("isActive") === "true",
     };
+
+    if (data.email && !data.email.endsWith("@linchpinsoftsolution.com")) {
+      toast.error("Email must be a @linchpinsoftsolution.com address");
+      setIsLoading(false);
+      return;
+    }
 
     try {
       const res = await fetch(`/api/users/${selectedUser.id}`, {
@@ -173,11 +185,20 @@ export default function UsersClient({ initialUsers, currentUserId }: UsersClient
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email">Email Address</Label>
-                <Input id="email" name="email" type="email" required placeholder="john@example.com" />
+                <Input 
+                  id="email" 
+                  name="email" 
+                  type="email" 
+                  required 
+                  placeholder="user@linchpinsoftsolution.com" 
+                  pattern=".+@linchpinsoftsolution\.com"
+                  title="Email must be a @linchpinsoftsolution.com address"
+                />
+                <p className="text-[10px] text-muted-foreground">Must be a @linchpinsoftsolution.com address</p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
-                <Input id="password" name="password" type="password" required placeholder="Leave blank to use Google SSO only" />
+                <Input id="password" name="password" type="password" required placeholder="Enter a Password for the User" />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="role">Role</Label>
@@ -198,7 +219,7 @@ export default function UsersClient({ initialUsers, currentUserId }: UsersClient
               </div>
               <div className="space-y-2">
                 <Label htmlFor="baseMonthlySalary">Base Monthly Salary (₹)</Label>
-                <Input id="baseMonthlySalary" name="baseMonthlySalary" type="number" min="0" step="0.01" required defaultValue="0" />
+                <Input id="baseMonthlySalary" name="baseMonthlySalary" type="number" min="0" step="1000" required defaultValue="0" />
               </div>
               <DialogFooter>
                 <Button type="submit" disabled={isLoading}>
@@ -297,9 +318,18 @@ export default function UsersClient({ initialUsers, currentUserId }: UsersClient
                 <Label htmlFor="edit-name">Full Name</Label>
                 <Input id="edit-name" name="name" required defaultValue={selectedUser.name} />
               </div>
-              <div className="space-y-2">
+               <div className="space-y-2">
                 <Label htmlFor="edit-email">Email Address</Label>
-                <Input id="edit-email" name="email" type="email" required defaultValue={selectedUser.email} />
+                <Input 
+                  id="edit-email" 
+                  name="email" 
+                  type="email" 
+                  required 
+                  defaultValue={selectedUser.email}
+                  pattern=".+@linchpinsoftsolution\.com"
+                  title="Email must be a @linchpinsoftsolution.com address"
+                />
+                <p className="text-[10px] text-muted-foreground">Must be a @linchpinsoftsolution.com address</p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="edit-password">New Password (Optional)</Label>
