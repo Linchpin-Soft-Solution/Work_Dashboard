@@ -217,9 +217,14 @@ export default function InvoicesClient({ initialInvoices, companyDetails }: Prop
         <div className="flex items-center justify-between border-b pb-4">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" onClick={() => setView("LIST")}><ArrowLeft className="h-5 w-5" /></Button>
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight">Create {isQuotation ? "Quotation" : "Invoice"}</h1>
-              <p className="text-sm text-muted-foreground">Fill in the details below to generate a new document.</p>
+            <div className="flex items-center gap-4">
+              {companyDetails.logoUrl && (
+                <img src={companyDetails.logoUrl} alt="Logo" className="h-12 w-auto object-contain" />
+              )}
+              <div>
+                <h1 className="text-2xl font-bold tracking-tight">Create {isQuotation ? "Quotation" : "Invoice"}</h1>
+                <p className="text-sm text-muted-foreground">Fill in the details below to generate a new document.</p>
+              </div>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -412,9 +417,14 @@ export default function InvoicesClient({ initialInvoices, companyDetails }: Prop
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-primary">Billing Overview</h1>
-          <p className="text-sm text-muted-foreground mt-1">Manage all your invoices, quotations, and payments in one place.</p>
+        <div className="flex items-center gap-4">
+          {companyDetails.logoUrl && (
+            <img src={companyDetails.logoUrl} alt="Logo" className="h-14 w-auto object-contain" />
+          )}
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-primary">Billing Overview</h1>
+            <p className="text-sm text-muted-foreground mt-1">Manage all your invoices, quotations, and payments in one place.</p>
+          </div>
         </div>
         <div className="flex gap-2">
           <Button onClick={() => { setIsQuotation(false); resetForm(); setView("FORM"); }}>

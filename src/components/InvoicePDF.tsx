@@ -1,15 +1,14 @@
 
 
 import React from "react";
-import { Document, Page, Text, View, StyleSheet, Font } from "@react-pdf/renderer";
+import { Document, Page, Text, View, StyleSheet, Font, Image } from "@react-pdf/renderer";
 import { numberToInrWords } from "@/lib/inrWords";
 
 // Register fonts if needed, using standard Helvetica for simplicity but structured well
 const styles = StyleSheet.create({
   page: { padding: 30, fontSize: 10, fontFamily: "Helvetica", color: "#334155" },
   headerContainer: { flexDirection: "row", justifyContent: "space-between", marginBottom: 20 },
-  logoBox: { width: 50, height: 50, backgroundColor: "#059669", borderRadius: 4, justifyContent: "center", alignItems: "center", marginBottom: 8 },
-  logoText: { color: "#fff", fontSize: 14, fontWeight: "bold" },
+  logo: { width: 180, height: 94, marginBottom: 10 },
   companyName: { fontSize: 16, fontWeight: "bold", color: "#059669" },
   companyTagline: { fontSize: 9, color: "#64748b", marginBottom: 2 },
   companyDetails: { fontSize: 8, lineHeight: 1.3 },
@@ -55,7 +54,7 @@ const styles = StyleSheet.create({
   bankTitle: { fontSize: 9, fontWeight: "bold", color: "#1e293b", marginBottom: 4 },
   bankRow: { flexDirection: "row", marginBottom: 2 },
   bankLabel: { width: 45, fontSize: 7, color: "#64748b" },
-  bankValue: { fontSize: 7, fontWeight: "bold", color: "#1e293b" },
+  bankValue: { fontSize: 7, fontWeight: "bold", color: "#1e293b", flex: 1 },
 
   notesBox: { width: "45%" },
   notesTitle: { fontSize: 9, fontWeight: "bold", color: "#1e293b", marginBottom: 2 },
@@ -99,9 +98,13 @@ export const InvoicePDF = ({ invoice, companyDetails }: InvoicePDFProps) => {
         {/* HEADER */}
         <View style={styles.headerContainer}>
           <View>
-            <View style={styles.logoBox}>
-              <Text style={styles.logoText}>LSS</Text>
-            </View>
+            {companyDetails.logoUrl ? (
+              <Image src={companyDetails.logoUrl} style={styles.logo} />
+            ) : (
+              <View style={{ width: 60, height: 30, backgroundColor: "#059669", borderRadius: 4, justifyContent: "center", alignItems: "center", marginBottom: 8 }}>
+                <Text style={{ color: "#fff", fontSize: 10, fontWeight: "bold" }}>LSS</Text>
+              </View>
+            )}
             <Text style={styles.companyName}>{companyDetails.name}</Text>
             <Text style={styles.companyTagline}>{companyDetails.tagline}</Text>
             <Text style={styles.companyDetails}>{companyDetails.address}</Text>
@@ -213,14 +216,22 @@ export const InvoicePDF = ({ invoice, companyDetails }: InvoicePDFProps) => {
               <Text style={styles.bankLabel}>Bank:</Text>
               <Text style={styles.bankValue}>{companyDetails.bank}</Text>
             </View>
+            {companyDetails.bank_account_number && (
+              <View style={styles.bankRow}>
+                <Text style={styles.bankLabel}>A/C No:</Text>
+                <Text style={styles.bankValue}>{companyDetails.bank_account_number}</Text>
+              </View>
+            )}
             <View style={styles.bankRow}>
               <Text style={styles.bankLabel}>IFSC:</Text>
               <Text style={styles.bankValue}>{companyDetails.ifsc}</Text>
             </View>
-            <View style={styles.bankRow}>
-              <Text style={styles.bankLabel}>UPI:</Text>
-              <Text style={styles.bankValue}>{companyDetails.upi}</Text>
-            </View>
+            {companyDetails.bank_address && (
+              <View style={styles.bankRow}>
+                <Text style={styles.bankLabel}>Address:</Text>
+                <Text style={styles.bankValue}>{companyDetails.bank_address}</Text>
+              </View>
+            )}
           </View>
 
           <View style={styles.notesBox}>

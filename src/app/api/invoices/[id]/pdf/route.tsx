@@ -3,6 +3,8 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { renderToStream } from "@react-pdf/renderer";
 import { InvoicePDF } from "@/components/InvoicePDF";
+import path from "path";
+import fs from "fs";
 
 export async function GET(
   req: NextRequest,
@@ -22,16 +24,26 @@ export async function GET(
 
     if (!invoice) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
+    const logoPath = path.join(process.cwd(), "public", "linchpin-logo.png");
+    let logoData = "";
+    try {
+      const buffer = fs.readFileSync(logoPath);
+      logoData = `data:image/png;base64,${buffer.toString('base64')}`;
+    } catch (e) {
+      console.error("Logo not found at", logoPath);
+    }
+
     const companyDetails = {
-      name: "Linchpin Soft Solution",
-      tagline: "Digital Marketing & Creative Studio",
-      address: "123, Tech Park, Sector 18, Noida - 201301",
-      email: "contact@linchpinsoft.com",
-      phone: "+91 98765 43210",
-      gstin: "09XXXXX0000X1Z5",
-      bank: "HDFC Bank",
-      ifsc: "HDFC0001234",
-      upi: "linchpin@hdfcbank"
+      name: "Linchpin Soft Solutions Private Limited",
+      logoUrl: logoData,
+      address: "Begumpet, Hyderabad - 500016",
+      email: "info@linchpinsoftsolution.com",
+      phone: "+91 74163 93958",
+      gstin: "36AAFCL5842D12L",
+      bank: "YES Bank",
+      bank_account_number: "000663700003726",
+      ifsc: "YESB0000006",
+      bank_address: "Raj Bhavan Road, Somajiguda, Hyderabad - 500082"
     };
 
     // Render the PDF to a Node stream
