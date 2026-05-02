@@ -21,7 +21,7 @@ function todayIST(): Date {
   return new Date(Date.UTC(ist.getFullYear(), ist.getMonth(), ist.getDate()));
 }
 
-export async function POST() {
+export async function POST(req: Request) {
   const session = await auth();
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -40,6 +40,33 @@ export async function POST() {
         { status: 403 }
       );
     }
+  }
+
+  // Parse optional geolocation from request body
+  let checkInLocation: string | null = null;
+  try {
+    const body = await req.json().catch(() => ({}));
+    const { latitude, longitude } = body ?? {};
+    if (typeof latitude === "number" && typeof longitude === "number") {
+      // Reverse-geocode using OpenStreetMap Nominatim (no API key required)
+      const geoRes = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`,
+        { headers: { "User-Agent": "LinchpinDashboard/1.0" } }
+      );
+      if (geoRes.ok) {
+        const geo = await geoRes.json();
+        const a = geo?.address ?? {};
+        // Build a compact label: suburb/town + city/state
+        const parts = [
+          a.suburb || a.neighbourhood || a.quarter,
+          a.city || a.town || a.village || a.county,
+          a.state,
+        ].filter(Boolean);
+        checkInLocation = parts.length ? parts.join(", ") : (geo?.display_name ?? null);
+      }
+    }
+  } catch {
+    // Geolocation is optional — proceed without it
   }
 
   const today = todayIST();
@@ -72,13 +99,14 @@ export async function POST() {
 
   const record = await prisma.attendance.upsert({
     where: { userId_date: { userId: session.user.id, date: today } },
-    update: { checkInTime: now, status, payMultiplier },
+    update: { checkInTime: now, status, payMultiplier, checkInLocation },
     create: {
       userId: session.user.id,
       date: today,
       checkInTime: now,
       status,
       payMultiplier,
+      checkInLocation,
     },
   });
 

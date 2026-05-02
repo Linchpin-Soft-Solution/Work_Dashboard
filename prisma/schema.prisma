@@ -37,6 +37,7 @@ model Attendance {
   date                DateTime
   checkInTime         DateTime?
   checkOutTime        DateTime?
+  checkInLocation     String?
   status              AttendanceStatus @default(ABSENT)
   payMultiplier       Float            @default(1.0)
   dailyLogSubmitted   Boolean          @default(false)

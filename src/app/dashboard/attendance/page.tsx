@@ -16,6 +16,7 @@ interface AttendanceRecord {
   date: string;
   checkInTime: string | null;
   checkOutTime: string | null;
+  checkInLocation: string | null;
   status: "PRESENT" | "LATE" | "ABSENT" | "HOLIDAY";
   payMultiplier: number;
   dailyLogSubmitted: boolean;
@@ -127,7 +128,23 @@ function EmployeeView({ userId }: { userId: string }) {
   async function handleCheckIn() {
     setActionLoading(true);
     setMsg(null);
-    const res = await fetch("/api/attendance/checkin", { method: "POST" });
+
+    // Try to capture browser geolocation
+    let body: Record<string, unknown> = {};
+    try {
+      const pos = await new Promise<GeolocationPosition>((resolve, reject) =>
+        navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 8000 })
+      );
+      body = { latitude: pos.coords.latitude, longitude: pos.coords.longitude };
+    } catch {
+      // Permission denied or unavailable — proceed without location
+    }
+
+    const res = await fetch("/api/attendance/checkin", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
     const data = await res.json();
     setActionLoading(false);
     if (!res.ok) {
@@ -189,6 +206,16 @@ function EmployeeView({ userId }: { userId: string }) {
             </p>
           </div>
         </div>
+
+        {todayRecord?.checkInLocation && (
+          <div className="flex items-start gap-2 bg-indigo-50 border border-indigo-100 rounded-xl px-4 py-3 mb-5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-indigo-500 mt-0.5 shrink-0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <div>
+              <p className="text-xs text-indigo-400 font-medium mb-0.5">Check-in Location</p>
+              <p className="text-sm font-medium text-indigo-700">{todayRecord.checkInLocation}</p>
+            </div>
+          </div>
+        )}
 
         {msg && (
           <div
@@ -306,6 +333,7 @@ function EmployeeView({ userId }: { userId: string }) {
                   <th className="px-5 py-3 text-left font-medium">Status</th>
                   <th className="px-5 py-3 text-left font-medium">Check-in</th>
                   <th className="px-5 py-3 text-left font-medium">Check-out</th>
+                  <th className="px-5 py-3 text-left font-medium">Location</th>
                   <th className="px-5 py-3 text-left font-medium">Multiplier</th>
                   <th className="px-5 py-3 text-left font-medium">Log</th>
                   <th className="px-5 py-3 text-left font-medium"></th>
@@ -318,6 +346,14 @@ function EmployeeView({ userId }: { userId: string }) {
                     <td className="px-5 py-3"><StatusBadge status={r.status} /></td>
                     <td className="px-5 py-3 text-gray-600">{formatTime(r.checkInTime)}</td>
                     <td className="px-5 py-3 text-gray-600">{formatTime(r.checkOutTime)}</td>
+                    <td className="px-5 py-3 text-gray-500 text-xs max-w-[180px]">
+                      {r.checkInLocation ? (
+                        <span className="flex items-center gap-1">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-indigo-400 shrink-0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                          {r.checkInLocation}
+                        </span>
+                      ) : "—"}
+                    </td>
                     <td className="px-5 py-3 text-gray-600">{r.payMultiplier.toFixed(1)}×</td>
                     <td className="px-5 py-3">
                       {r.dailyLogSubmitted ? (
@@ -727,6 +763,7 @@ function AdminView() {
                   <th className="px-5 py-3 text-left font-medium">Status</th>
                   <th className="px-5 py-3 text-left font-medium">Check-in</th>
                   <th className="px-5 py-3 text-left font-medium">Check-out</th>
+                  <th className="px-5 py-3 text-left font-medium">Location</th>
                   <th className="px-5 py-3 text-left font-medium">Multiplier</th>
                   <th className="px-5 py-3 text-left font-medium">Log</th>
                   <th className="px-5 py-3 text-left font-medium">Note</th>
@@ -745,6 +782,14 @@ function AdminView() {
                     <td className="px-5 py-3"><StatusBadge status={r.status} /></td>
                     <td className="px-5 py-3 text-gray-600">{formatTime(r.checkInTime)}</td>
                     <td className="px-5 py-3 text-gray-600">{formatTime(r.checkOutTime)}</td>
+                    <td className="px-5 py-3 text-gray-500 text-xs max-w-[180px]">
+                      {r.checkInLocation ? (
+                        <span className="flex items-center gap-1">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-indigo-400 shrink-0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                          {r.checkInLocation}
+                        </span>
+                      ) : "—"}
+                    </td>
                     <td className="px-5 py-3 text-gray-600">{r.payMultiplier.toFixed(1)}×</td>
                     <td className="px-5 py-3">
                       {r.dailyLogSubmitted ? (
