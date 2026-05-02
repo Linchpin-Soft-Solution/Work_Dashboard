@@ -20,7 +20,6 @@ export default async function InvoicesPage() {
 
   const companyDetails = {
     name: "Linchpin Soft Solutions Private Limited",
-    tagline: "Digital Marketing & Creative Studio",
     address: "Begumpet, Hyderabad - 500016",
     email: "info@linchpinsoftsolution.com",
     phone: "+91 74163 93958",

@@ -10,7 +10,6 @@ const styles = StyleSheet.create({
   headerContainer: { flexDirection: "row", justifyContent: "space-between", marginBottom: 20 },
   logo: { width: 180, height: 94, marginBottom: 10 },
   companyName: { fontSize: 16, fontWeight: "bold", color: "#059669" },
-  companyTagline: { fontSize: 9, color: "#64748b", marginBottom: 2 },
   companyDetails: { fontSize: 8, lineHeight: 1.3 },
   docTitle: { fontSize: 24, fontWeight: "bold", color: "#059669", textTransform: "uppercase", textAlign: "right" },
   docNumber: { fontSize: 11, fontWeight: "bold", textAlign: "right", marginTop: 2 },
@@ -106,7 +105,6 @@ export const InvoicePDF = ({ invoice, companyDetails }: InvoicePDFProps) => {
               </View>
             )}
             <Text style={styles.companyName}>{companyDetails.name}</Text>
-            <Text style={styles.companyTagline}>{companyDetails.tagline}</Text>
             <Text style={styles.companyDetails}>{companyDetails.address}</Text>
             <Text style={styles.companyDetails}>{companyDetails.email} | {companyDetails.phone}</Text>
             {companyDetails.gstin ? <Text style={styles.companyDetails}>GSTIN: {companyDetails.gstin}</Text> : null}
@@ -195,7 +193,7 @@ export const InvoicePDF = ({ invoice, companyDetails }: InvoicePDFProps) => {
 
             {invoice.gstAmount > 0 ? (
               <View style={styles.totalRow}>
-                <Text style={styles.totalLabel}>Total GST</Text>
+                <Text style={styles.totalLabel}>Total GST {invoice.gstPercent}%</Text>
                 <Text style={styles.totalValue}>{formatMoney(invoice.gstAmount)}</Text>
               </View>
             ) : null}
