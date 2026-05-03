@@ -8,7 +8,11 @@
     "start": "next start",
     "lint": "eslint",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "prisma:generate": "prisma generate",
+    "prisma:push": "prisma db push",
+    "seed": "tsx seed.ts",
+    "postinstall": "npm run prisma:generate"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.2",
