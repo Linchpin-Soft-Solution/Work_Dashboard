@@ -7,7 +7,7 @@ export default async function InvoicesPage() {
   const session = await auth();
 
   if (!session || session.user.role !== "ADMIN") {
-    redirect("/dashboard");
+    redirect("/");
   }
 
   const invoices = await prisma.invoice.findMany({

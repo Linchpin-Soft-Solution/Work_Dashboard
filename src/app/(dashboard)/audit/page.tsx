@@ -7,7 +7,7 @@ export default async function AuditLogPage() {
   const session = await auth();
 
   if (!session || session.user.role !== "ADMIN") {
-    redirect("/dashboard");
+    redirect("/");
   }
 
   // Fetch audit logs

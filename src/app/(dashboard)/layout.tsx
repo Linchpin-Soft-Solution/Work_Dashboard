@@ -7,25 +7,25 @@ import ChangePasswordDialog from "@/components/ChangePasswordDialog";
 import SignOutDialog from "@/components/SignOutDialog";
 
 const adminLinks = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/dashboard/attendance", label: "Attendance" },
-  { href: "/dashboard/logs", label: "Daily Logs" },
-  { href: "/dashboard/targets", label: "Targets" },
-  { href: "/dashboard/pay", label: "Pay Records" },
-  { href: "/dashboard/invoices", label: "Invoices" },
-  { href: "/dashboard/calendar", label: "Calendar" },
-  { href: "/dashboard/reports", label: "Reports" },
-  { href: "/dashboard/users", label: "User Management" },
-  { href: "/dashboard/audit", label: "Audit Log" },
+  { href: "/", label: "Dashboard" },
+  { href: "/attendance", label: "Attendance" },
+  { href: "/logs", label: "Daily Logs" },
+  { href: "/targets", label: "Targets" },
+  { href: "/pay", label: "Pay Records" },
+  { href: "/invoices", label: "Invoices" },
+  { href: "/calendar", label: "Calendar" },
+  { href: "/reports", label: "Reports" },
+  { href: "/users", label: "User Management" },
+  { href: "/audit", label: "Audit Log" },
 ];
 
 const employeeLinks = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/dashboard/attendance", label: "Attendance" },
-  { href: "/dashboard/logs", label: "Daily Logs" },
-  { href: "/dashboard/targets", label: "Targets" },
-  { href: "/dashboard/calendar", label: "Calendar" },
-  { href: "/dashboard/pay", label: "Pay Records" },
+  { href: "/", label: "Dashboard" },
+  { href: "/attendance", label: "Attendance" },
+  { href: "/logs", label: "Daily Logs" },
+  { href: "/targets", label: "Targets" },
+  { href: "/calendar", label: "Calendar" },
+  { href: "/pay", label: "Pay Records" },
 ];
 
 export default async function DashboardLayout({

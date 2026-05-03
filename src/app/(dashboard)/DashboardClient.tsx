@@ -153,7 +153,7 @@ export default function DashboardClient({ stats }: { stats: DashboardStats }) {
               <CardTitle>Active Targets</CardTitle>
               <CardDescription>Your current pending and in-progress targets.</CardDescription>
             </div>
-            <Link href="/dashboard/targets" className="text-sm text-blue-600 hover:text-blue-800 flex items-center">
+            <Link href="/targets" className="text-sm text-blue-600 hover:text-blue-800 flex items-center">
               View all <ArrowRight className="ml-1 w-4 h-4" />
             </Link>
           </CardHeader>
@@ -200,7 +200,7 @@ export default function DashboardClient({ stats }: { stats: DashboardStats }) {
               <CardTitle>Upcoming Events</CardTitle>
               <CardDescription>Your upcoming calendar schedule.</CardDescription>
             </div>
-            <Link href="/dashboard/calendar" className="text-sm text-blue-600 hover:text-blue-800 flex items-center">
+            <Link href="/calendar" className="text-sm text-blue-600 hover:text-blue-800 flex items-center">
               View all <ArrowRight className="ml-1 w-4 h-4" />
             </Link>
           </CardHeader>
