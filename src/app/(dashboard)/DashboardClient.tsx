@@ -59,8 +59,8 @@ export default function DashboardClient({ stats }: { stats: DashboardStats }) {
               <CalendarCheck className="w-4 h-4 text-emerald-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-emerald-600">
-                {stats.adminStats.presentToday} <span className="text-lg text-slate-400 font-medium">present</span>
+              <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-500">
+                {stats.adminStats.presentToday} <span className="text-lg text-slate-400 dark:text-slate-500 font-medium">present</span>
               </div>
               <p className="text-xs text-slate-500 mt-1">
                 {stats.adminStats.lateToday} late, {stats.adminStats.absentToday} absent
@@ -101,10 +101,10 @@ export default function DashboardClient({ stats }: { stats: DashboardStats }) {
             </CardHeader>
             <CardContent>
               <div className={cn("text-2xl font-bold", 
-                stats.employeeStats.attendanceToday === 'PRESENT' ? 'text-emerald-600' :
-                stats.employeeStats.attendanceToday === 'LATE' ? 'text-amber-600' :
-                stats.employeeStats.attendanceToday === 'ABSENT' ? 'text-red-600' :
-                stats.employeeStats.attendanceToday === 'HOLIDAY' ? 'text-blue-600' : 'text-slate-600'
+                stats.employeeStats.attendanceToday === 'PRESENT' ? 'text-emerald-600 dark:text-emerald-500' :
+                stats.employeeStats.attendanceToday === 'LATE' ? 'text-amber-600 dark:text-amber-500' :
+                stats.employeeStats.attendanceToday === 'ABSENT' ? 'text-red-600 dark:text-red-500' :
+                stats.employeeStats.attendanceToday === 'HOLIDAY' ? 'text-blue-600 dark:text-blue-400' : 'text-slate-600 dark:text-slate-400'
               )}>
                 {stats.employeeStats.attendanceToday || "Not Checked In"}
               </div>
@@ -135,7 +135,7 @@ export default function DashboardClient({ stats }: { stats: DashboardStats }) {
               )}
             </CardHeader>
             <CardContent>
-              <div className={cn("text-2xl font-bold", stats.employeeStats.logSubmittedToday ? "text-emerald-600" : "text-amber-600")}>
+              <div className={cn("text-2xl font-bold", stats.employeeStats.logSubmittedToday ? "text-emerald-600 dark:text-emerald-500" : "text-amber-600 dark:text-amber-500")}>
                 {stats.employeeStats.logSubmittedToday ? "Submitted" : "Pending"}
               </div>
               <p className="text-xs text-slate-500 mt-1">
@@ -166,9 +166,9 @@ export default function DashboardClient({ stats }: { stats: DashboardStats }) {
                       <p className="text-sm font-medium leading-none">{target.title}</p>
                       <div className="flex items-center text-xs text-slate-500 space-x-2">
                         <span className={cn("px-2 py-0.5 rounded-full",
-                          target.priority === 'HIGH' ? 'bg-red-100 text-red-700' :
-                          target.priority === 'MEDIUM' ? 'bg-amber-100 text-amber-700' :
-                          'bg-emerald-100 text-emerald-700'
+                          target.priority === 'HIGH' ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400' :
+                          target.priority === 'MEDIUM' ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400' :
+                          'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'
                         )}>
                           {target.priority}
                         </span>
@@ -208,8 +208,8 @@ export default function DashboardClient({ stats }: { stats: DashboardStats }) {
             {stats.upcomingEvents && stats.upcomingEvents.length > 0 ? (
               <div className="space-y-4">
                 {stats.upcomingEvents.map((event) => (
-                  <div key={event.id} className="flex items-center space-x-4 border-b pb-3 last:border-0 last:pb-0">
-                    <div className="flex flex-col items-center justify-center bg-blue-50 text-blue-700 rounded-lg p-2 min-w-[50px]">
+                  <div key={event.id} className="flex items-center space-x-4 border-b dark:border-gray-800 pb-3 last:border-0 last:pb-0">
+                    <div className="flex flex-col items-center justify-center bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-lg p-2 min-w-[50px]">
                       <span className="text-xs font-semibold">{format(new Date(event.startTime), "MMM")}</span>
                       <span className="text-lg font-bold">{format(new Date(event.startTime), "d")}</span>
                     </div>

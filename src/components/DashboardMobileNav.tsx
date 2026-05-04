@@ -16,7 +16,7 @@ export default function DashboardMobileNav({ sidebarContent }: { sidebarContent:
   }, [pathname]);
 
   return (
-    <div className="md:hidden flex items-center justify-between p-4 bg-white border-b border-border shrink-0">
+    <div className="md:hidden flex items-center justify-between p-4 bg-white dark:bg-gray-900 border-b border-border dark:border-gray-800 shrink-0 transition-colors duration-300">
       <div className="flex items-center">
         <Image src="/linchpin-logo.png" alt="Linchpin Logo" width={120} height={24} className="h-6 w-auto" priority />
       </div>
@@ -25,7 +25,7 @@ export default function DashboardMobileNav({ sidebarContent }: { sidebarContent:
           <Menu className="h-6 w-6" />
           <span className="sr-only">Toggle Menu</span>
         </SheetTrigger>
-        <SheetContent side="left" className="w-64 p-0 flex flex-col bg-white">
+        <SheetContent side="left" className="w-64 p-0 flex flex-col bg-white dark:bg-gray-900 border-r dark:border-gray-800">
           <SheetHeader className="sr-only">
              <SheetTitle>Navigation Menu</SheetTitle>
           </SheetHeader>

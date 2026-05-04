@@ -19,7 +19,7 @@ export default function SignOutDialog() {
     <AlertDialog>
       <AlertDialogTrigger
         render={
-          <button className="w-full text-left px-3 py-2 rounded-lg text-sm bg-red-100 text-red-500 hover:bg-red-200 transition flex items-center gap-2 mb-1" />
+          <button className="w-full text-left px-3 py-2 rounded-lg text-sm bg-red-100 dark:bg-red-950/30 text-red-500 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/40 transition flex items-center gap-2 mb-1" />
         }
       >
         <LogOut className="h-4 w-4" />

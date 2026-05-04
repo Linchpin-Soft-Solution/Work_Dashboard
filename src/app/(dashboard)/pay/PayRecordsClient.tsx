@@ -134,33 +134,33 @@ function AddAdjustmentDialog({ payRecordId, onClose, onSaved }: {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 p-6">
-        <h3 className="font-bold text-gray-800 text-lg mb-5">Add Adjustment</h3>
+      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-md mx-4 p-6 border dark:border-gray-800">
+        <h3 className="font-bold text-gray-800 dark:text-gray-100 text-lg mb-5">Add Adjustment</h3>
         <div className="space-y-4">
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Type</label>
+            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Type</label>
             <select value={type} onChange={e => setType(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              className="w-full border border-gray-200 dark:border-gray-800 rounded-lg px-3 py-2 text-sm text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500">
               {Object.entries(ADJ_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
             </select>
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Amount (₹)</label>
+            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Amount (₹)</label>
             <input type="number" min="0" step="0.01" value={amount} onChange={e => setAmount(e.target.value)}
               placeholder="e.g. 5000"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-            <p className="text-xs text-gray-400 mt-1">Deductions will be subtracted; all others are added.</p>
+              className="w-full border border-gray-200 dark:border-gray-800 rounded-lg px-3 py-2 text-sm text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Deductions will be subtracted; all others are added.</p>
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Reason <span className="text-red-500">*</span></label>
+            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Reason <span className="text-red-500">*</span></label>
             <textarea rows={3} value={reason} onChange={e => setReason(e.target.value)}
               placeholder="Describe the reason for this adjustment…"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+              className="w-full border border-gray-200 dark:border-gray-800 rounded-lg px-3 py-2 text-sm text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-800 resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500" />
           </div>
-          {err && <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{err}</p>}
+          {err && <p className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/30 rounded-lg px-3 py-2">{err}</p>}
         </div>
         <div className="flex gap-3 mt-6">
-          <button onClick={onClose} className="flex-1 py-2.5 rounded-xl text-sm font-medium border border-gray-200 text-gray-600 hover:bg-gray-50 transition">Cancel</button>
+          <button onClick={onClose} className="flex-1 py-2.5 rounded-xl text-sm font-medium border border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition">Cancel</button>
           <button onClick={save} disabled={saving} className="flex-1 py-2.5 rounded-xl text-sm font-semibold bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50 transition">
             {saving ? "Saving…" : "Add Adjustment"}
           </button>
@@ -193,7 +193,7 @@ function PayRecordCard({ record, isAdmin, onUpdated }: {
   const dailyRate = record.workingDays > 0 ? record.baseSalary / record.workingDays : 0;
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden">
       {showAddAdj && (
         <AddAdjustmentDialog
           payRecordId={record.id}
@@ -203,20 +203,20 @@ function PayRecordCard({ record, isAdmin, onUpdated }: {
       )}
 
       {/* Header */}
-      <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+      <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
         <div>
-          <p className="font-semibold text-gray-800">
+          <p className="font-semibold text-gray-800 dark:text-gray-100">
             {isAdmin ? record.User.name : format(new Date(record.month), "MMMM yyyy")}
           </p>
           {isAdmin && (
-            <p className="text-xs text-gray-400 mt-0.5">
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
               {record.User.designation} · {format(new Date(record.month), "MMMM yyyy")}
             </p>
           )}
         </div>
         <div className="text-right">
-          <p className="text-xs text-gray-400">Final Pay</p>
-          <p className="text-xl font-bold text-indigo-600">{fmt(record.finalPay)}</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500">Final Pay</p>
+          <p className="text-xl font-bold text-indigo-600 dark:text-indigo-400">{fmt(record.finalPay)}</p>
         </div>
       </div>
 
@@ -228,36 +228,36 @@ function PayRecordCard({ record, isAdmin, onUpdated }: {
           { label: "Working Days", value: record.workingDays },
           { label: "Base Calculated", value: fmt(record.calculatedPay) },
         ].map(({ label, value }) => (
-          <div key={label} className="bg-gray-50 rounded-xl p-3">
-            <p className="text-xs text-gray-400 mb-1">{label}</p>
-            <p className="text-sm font-semibold text-gray-800">{value}</p>
+          <div key={label} className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-3">
+            <p className="text-xs text-gray-400 dark:text-gray-500 mb-1">{label}</p>
+            <p className="text-sm font-semibold text-gray-800 dark:text-gray-100">{value}</p>
           </div>
         ))}
       </div>
 
       {/* Attendance Summary */}
       <div className="px-6 pb-4 flex gap-3 flex-wrap">
-        <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2">
-          <span className="text-xs font-medium text-emerald-700">Present</span>
-          <span className="text-sm font-bold text-emerald-800">{record.presentDays}</span>
+        <div className="flex items-center gap-2 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/30 rounded-xl px-3 py-2">
+          <span className="text-xs font-medium text-emerald-700 dark:text-emerald-400">Present</span>
+          <span className="text-sm font-bold text-emerald-800 dark:text-emerald-300">{record.presentDays}</span>
         </div>
-        <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2">
-          <span className="text-xs font-medium text-amber-700">Late</span>
-          <span className="text-sm font-bold text-amber-800">{record.lateDays}</span>
+        <div className="flex items-center gap-2 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/30 rounded-xl px-3 py-2">
+          <span className="text-xs font-medium text-amber-700 dark:text-amber-400">Late</span>
+          <span className="text-sm font-bold text-amber-800 dark:text-amber-300">{record.lateDays}</span>
         </div>
-        <div className="flex items-center gap-2 bg-red-50 border border-red-200 rounded-xl px-3 py-2">
-          <span className="text-xs font-medium text-red-600">Absent</span>
-          <span className="text-sm font-bold text-red-700">{record.absentDays}</span>
+        <div className="flex items-center gap-2 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/30 rounded-xl px-3 py-2">
+          <span className="text-xs font-medium text-red-600 dark:text-red-400">Absent</span>
+          <span className="text-sm font-bold text-red-700 dark:text-red-300">{record.absentDays}</span>
         </div>
       </div>
 
       {/* Adjustments */}
-      <div className="border-t border-gray-100 px-6 py-4">
+      <div className="border-t border-gray-100 dark:border-gray-800 px-6 py-4">
         <div className="flex items-center justify-between mb-3">
-          <p className="text-sm font-semibold text-gray-700">Adjustments</p>
+          <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">Adjustments</p>
           {isAdmin && (
             <button onClick={() => setShowAddAdj(true)}
-              className="flex items-center gap-1.5 text-xs font-medium text-indigo-600 hover:text-indigo-700 bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-100 hover:bg-indigo-100 transition">
+              className="flex items-center gap-1.5 text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/30 px-3 py-1.5 rounded-lg border border-indigo-100 dark:border-indigo-900/40 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition">
               <Plus className="h-3.5 w-3.5" /> Add
             </button>
           )}
@@ -268,17 +268,17 @@ function PayRecordCard({ record, isAdmin, onUpdated }: {
         ) : (
           <div className="space-y-2">
             {record.PayAdjustment.map(adj => (
-              <div key={adj.id} className="flex items-center justify-between bg-gray-50 rounded-xl px-4 py-3">
+              <div key={adj.id} className="flex items-center justify-between bg-gray-50 dark:bg-gray-800/50 rounded-xl px-4 py-3">
                 <div>
                   <div className="flex items-center gap-2">
                     <span className={`text-xs font-medium px-2 py-0.5 rounded-full border ${
                       adj.type === "DEDUCTION"
-                        ? "bg-red-50 text-red-600 border-red-200"
+                        ? "bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 border-red-200 dark:border-red-900/40"
                         : adj.type === "BONUS"
-                        ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                        : "bg-blue-50 text-blue-600 border-blue-200"
+                        ? "bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-900/40"
+                        : "bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-900/40"
                     }`}>{ADJ_LABELS[adj.type]}</span>
-                    <span className={`text-sm font-semibold ${adj.type === "DEDUCTION" ? "text-red-600" : "text-emerald-600"}`}>
+                    <span className={`text-sm font-semibold ${adj.type === "DEDUCTION" ? "text-red-600 dark:text-red-500" : "text-emerald-600 dark:text-emerald-500"}`}>
                       {adj.type === "DEDUCTION" ? "-" : "+"}{fmt(adj.amount)}
                     </span>
                   </div>
@@ -382,37 +382,36 @@ function AdminView({ users }: { users: User[] }) {
       )}
 
       {/* Controls */}
-      <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
-        <h2 className="text-sm font-semibold text-gray-700 mb-4">Calculate Pay Record</h2>
+      <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-5 shadow-sm">
+        <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">Calculate Pay Record</h2>
         <div className="flex flex-wrap gap-3 items-end">
           <div>
             <label className="block text-xs text-gray-500 mb-1">Month</label>
             <div className="flex items-center gap-2">
               <button onClick={() => setMonth(m => addMonths(m, -1))}
-                className="p-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 transition">
+                className="p-1.5 rounded-lg border border-gray-200 dark:border-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition">
                 <ChevronLeft className="h-4 w-4" />
               </button>
               <MonthPicker value={month} onChange={setMonth} />
               <button onClick={() => setMonth(m => addMonths(m, 1))}
-                className="p-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 transition">
+                className="p-1.5 rounded-lg border border-gray-200 dark:border-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition">
                 <ChevronRight className="h-4 w-4" />
               </button>
             </div>
           </div>
 
           <div>
-            <label className="block text-xs text-gray-500 mb-1">Employee</label>
+            <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Employee</label>
             <select value={selectedUserId} onChange={e => setSelectedUserId(e.target.value)}
-              className="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 min-w-[180px]">
+              className="border border-gray-200 dark:border-gray-800 rounded-lg px-3 py-2 text-sm text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 min-w-[180px]">
               <option value="">Select employee…</option>
               {users.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
             </select>
           </div>
-
           <div>
-            <label className="block text-xs text-gray-500 mb-1">Working Days</label>
+            <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Working Days</label>
             <input type="number" min="1" max="31" value={workingDays} onChange={e => setWorkingDays(e.target.value)}
-              className="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 w-24" />
+              className="border border-gray-200 dark:border-gray-800 rounded-lg px-3 py-2 text-sm text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 w-24" />
           </div>
 
           <button onClick={generate} disabled={generating}
@@ -422,7 +421,11 @@ function AdminView({ users }: { users: User[] }) {
         </div>
 
         {msg && (
-          <p className={`mt-3 text-sm px-4 py-2.5 rounded-lg ${msg.ok ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-red-50 text-red-600 border border-red-200"}`}>
+          <p className={`mt-3 text-sm px-4 py-2.5 rounded-lg ${
+            msg.ok 
+              ? "bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/30" 
+              : "bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/30"
+          }`}>
             {msg.text}
           </p>
         )}
@@ -430,20 +433,20 @@ function AdminView({ users }: { users: User[] }) {
 
       {/* Summary Table */}
       {records.length > 0 && (
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-            <h3 className="font-semibold text-gray-800">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+            <h3 className="font-semibold text-gray-800 dark:text-gray-100">
               All Records — {format(new Date(month + "-01T00:00:00"), "MMMM yyyy")}
             </h3>
             <button onClick={() => exportCSV(records, month)}
-              className="flex items-center gap-1.5 text-xs font-medium text-gray-600 hover:text-gray-800 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-100 transition">
+              className="flex items-center gap-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 bg-gray-50 dark:bg-gray-800/50 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
               <Download className="h-3.5 w-3.5" /> Export CSV
             </button>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-gray-50 text-xs text-gray-500 uppercase tracking-wide">
+                <tr className="bg-gray-50 dark:bg-gray-800/50 text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">
                   <th className="px-5 py-3 text-left font-medium">Employee</th>
                   <th className="px-5 py-3 text-right font-medium">Base Salary</th>
                   <th className="px-5 py-3 text-right font-medium">Present</th>
@@ -454,23 +457,23 @@ function AdminView({ users }: { users: User[] }) {
                   <th className="px-5 py-3 text-center font-medium">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
                 {records.map(r => (
-                  <tr key={r.id} className="hover:bg-gray-50/60 transition">
+                  <tr key={r.id} className="hover:bg-gray-50/60 dark:hover:bg-gray-800/30 transition">
                     <td className="px-5 py-3">
-                      <p className="font-medium text-gray-800">{r.User.name}</p>
-                      {r.User.designation && <p className="text-xs text-gray-400">{r.User.designation}</p>}
+                      <p className="font-medium text-gray-800 dark:text-gray-100">{r.User.name}</p>
+                      {r.User.designation && <p className="text-xs text-gray-400 dark:text-gray-500">{r.User.designation}</p>}
                     </td>
-                    <td className="px-5 py-3 text-right text-gray-600">{fmt(r.baseSalary)}</td>
-                    <td className="px-5 py-3 text-right text-emerald-600 font-medium">{r.presentDays}</td>
-                    <td className="px-5 py-3 text-right text-amber-600 font-medium">{r.lateDays}</td>
-                    <td className="px-5 py-3 text-right text-red-500 font-medium">{r.absentDays}</td>
-                    <td className="px-5 py-3 text-right text-gray-600">{fmt(r.calculatedPay)}</td>
-                    <td className="px-5 py-3 text-right font-bold text-indigo-600">{fmt(r.finalPay)}</td>
+                    <td className="px-5 py-3 text-right text-gray-600 dark:text-gray-400">{fmt(r.baseSalary)}</td>
+                    <td className="px-5 py-3 text-right text-emerald-600 dark:text-emerald-500 font-medium">{r.presentDays}</td>
+                    <td className="px-5 py-3 text-right text-amber-600 dark:text-amber-500 font-medium">{r.lateDays}</td>
+                    <td className="px-5 py-3 text-right text-red-500 dark:text-red-400 font-medium">{r.absentDays}</td>
+                    <td className="px-5 py-3 text-right text-gray-600 dark:text-gray-400">{fmt(r.calculatedPay)}</td>
+                    <td className="px-5 py-3 text-right font-bold text-indigo-600 dark:text-indigo-400">{fmt(r.finalPay)}</td>
                     <td className="px-5 py-3 text-center">
                       <button 
                         onClick={() => setAddingAdjForRecordId(r.id)}
-                        className="inline-flex items-center gap-1.5 text-xs font-medium text-indigo-600 hover:text-indigo-700 bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-100 hover:bg-indigo-100 transition"
+                        className="inline-flex items-center gap-1.5 text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/30 px-3 py-1.5 rounded-lg border border-indigo-100 dark:border-indigo-900/40 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition"
                       >
                         <Plus className="h-3.5 w-3.5" /> Add Adj
                       </button>
@@ -516,8 +519,8 @@ function EmployeeView({ userId }: { userId: string }) {
   if (records.length === 0) {
     return (
       <div className="py-16 text-center">
-        <p className="text-gray-400 text-sm">No pay records available yet.</p>
-        <p className="text-gray-400 text-xs mt-1">Your admin will generate your monthly pay records.</p>
+        <p className="text-gray-400 dark:text-gray-500 text-sm">No pay records available yet.</p>
+        <p className="text-gray-400 dark:text-gray-500 text-xs mt-1">Your admin will generate your monthly pay records.</p>
       </div>
     );
   }
@@ -544,8 +547,8 @@ export default function PayRecordsClient({
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Pay Records</h1>
-        <p className="text-sm text-gray-500 mt-1">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Pay Records</h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
           {isAdmin
             ? "Calculate monthly pay and manage adjustments for each employee."
             : "View your monthly pay history including attendance breakdown and adjustments."}
