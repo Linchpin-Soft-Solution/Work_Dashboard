@@ -64,7 +64,7 @@ export default function ChangePasswordDialog() {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger
         render={
-          <button className="w-full text-left px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition flex items-center gap-2 mb-1" />
+          <button className="w-full text-left px-3 py-2 rounded-lg text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition flex items-center gap-2 mb-1" />
         }
       >
         <Lock className="h-4 w-4" />

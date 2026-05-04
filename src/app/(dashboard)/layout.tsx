@@ -5,6 +5,7 @@ import SidebarNav from "@/components/SidebarNav";
 import DashboardMobileNav from "@/components/DashboardMobileNav";
 import ChangePasswordDialog from "@/components/ChangePasswordDialog";
 import SignOutDialog from "@/components/SignOutDialog";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const adminLinks = [
   { href: "/", label: "Dashboard" },
@@ -42,7 +43,7 @@ export default async function DashboardLayout({
 
   const sidebarContent = (
     <>
-      <div className="hidden md:block p-5 border-b border-gray-100">
+      <div className="hidden md:block p-5 border-b border-gray-100 dark:border-gray-800">
         <Image 
           src="/linchpin-logo.png" 
           alt="Linchpin Logo" 
@@ -51,18 +52,19 @@ export default async function DashboardLayout({
           className="h-auto w-auto max-h-24"
           priority
         />
-        <p className="text-xs text-gray-400 mt-2">
+        <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
           {isAdmin ? "Admin" : "Employee"} · {session.user.name}
         </p>
       </div>
-      <div className="md:hidden px-5 py-4 border-b border-gray-100">
-        <p className="text-sm font-semibold text-gray-900">{session.user.name}</p>
-        <p className="text-xs text-gray-500 mt-0.5">{isAdmin ? "Admin" : "Employee"}</p>
+      <div className="md:hidden px-5 py-4 border-b border-gray-100 dark:border-gray-800">
+        <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">{session.user.name}</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{isAdmin ? "Admin" : "Employee"}</p>
       </div>
 
       <SidebarNav links={links} />
 
-      <div className="px-3 py-4 border-t border-gray-100 mt-auto">
+      <div className="px-3 py-4 border-t border-gray-100 dark:border-gray-800 mt-auto">
+        <ThemeToggle />
         <ChangePasswordDialog />
         <SignOutDialog />
       </div>
@@ -70,16 +72,16 @@ export default async function DashboardLayout({
   );
 
   return (
-    <div className="flex h-screen bg-gray-50 flex-col md:flex-row overflow-hidden w-full">
+    <div className="flex h-screen bg-gray-50 dark:bg-gray-950 flex-col md:flex-row overflow-hidden w-full transition-colors duration-300">
       <DashboardMobileNav sidebarContent={sidebarContent} />
       
       {/* Sidebar Desktop */}
-      <aside className="w-56 bg-white border-r border-gray-200 hidden md:flex flex-col shrink-0">
+      <aside className="w-56 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 hidden md:flex flex-col shrink-0 transition-colors duration-300">
         {sidebarContent}
       </aside>
 
       {/* Main content */}
-      <main className="flex-1 p-4 sm:p-6 md:p-8 overflow-y-auto w-full">
+      <main className="flex-1 p-4 sm:p-6 md:p-8 overflow-y-auto w-full bg-gray-50 dark:bg-gray-950 transition-colors duration-300 text-foreground">
         {children}
       </main>
     </div>

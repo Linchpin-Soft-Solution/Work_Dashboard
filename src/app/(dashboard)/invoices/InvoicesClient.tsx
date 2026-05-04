@@ -20,12 +20,12 @@ import {
 
 // Service Quick Add Configurations
 const QUICK_SERVICES = [
-  { name: "Reels Management", category: "Reels", rate: 15000, desc: "Monthly Instagram Reels Production & Editing", icon: Briefcase, color: "bg-pink-100 text-pink-700 border-pink-200" },
-  { name: "Social Media", category: "Social Media", rate: 25000, desc: "End-to-end SM Management (FB, IG, LI)", icon: MessageSquare, color: "bg-teal-100 text-teal-700 border-teal-200" },
-  { name: "Paid Ads", category: "Paid Ads", rate: 20000, desc: "Google & Meta Ads Management", icon: LayoutDashboard, color: "bg-purple-100 text-purple-700 border-purple-200" },
-  { name: "SEO Optimization", category: "SEO", rate: 18000, desc: "On-page & Off-page SEO Services", icon: Search, color: "bg-green-100 text-green-700 border-green-200" },
-  { name: "UI/UX Design", category: "Design", rate: 40000, desc: "Website/App Interface Design", icon: PenTool, color: "bg-orange-100 text-orange-700 border-orange-200" },
-  { name: "CRM Setup", category: "CRM", rate: 30000, desc: "Lead Management System Configuration", icon: LayoutDashboard, color: "bg-indigo-100 text-indigo-700 border-indigo-200" }
+  { name: "Reels Management", category: "Reels", rate: 15000, desc: "Monthly Instagram Reels Production & Editing", icon: Briefcase, color: "bg-pink-100 dark:bg-pink-900/20 text-pink-700 dark:text-pink-400 border-pink-200 dark:border-pink-800/50" },
+  { name: "Social Media", category: "Social Media", rate: 25000, desc: "End-to-end SM Management (FB, IG, LI)", icon: MessageSquare, color: "bg-teal-100 dark:bg-teal-900/20 text-teal-700 dark:text-teal-400 border-teal-200 dark:border-teal-800/50" },
+  { name: "Paid Ads", category: "Paid Ads", rate: 20000, desc: "Google & Meta Ads Management", icon: LayoutDashboard, color: "bg-purple-100 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400 border-purple-200 dark:border-purple-800/50" },
+  { name: "SEO Optimization", category: "SEO", rate: 18000, desc: "On-page & Off-page SEO Services", icon: Search, color: "bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800/50" },
+  { name: "UI/UX Design", category: "Design", rate: 40000, desc: "Website/App Interface Design", icon: PenTool, color: "bg-orange-100 dark:bg-orange-900/20 text-orange-700 dark:text-orange-400 border-orange-200 dark:border-orange-800/50" },
+  { name: "CRM Setup", category: "CRM", rate: 30000, desc: "Lead Management System Configuration", icon: LayoutDashboard, color: "bg-indigo-100 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800/50" }
 ];
 
 interface LineItem {
@@ -204,17 +204,17 @@ export default function InvoicesClient({ initialInvoices, companyDetails }: Prop
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case "PAID": return <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-none">Paid</Badge>;
-      case "SENT": return <Badge className="bg-emerald-50 text-emerald-600 hover:bg-emerald-50 border-none">Sent</Badge>;
-      case "CANCELLED": return <Badge className="bg-red-100 text-red-700 hover:bg-red-100 border-none">Cancelled</Badge>;
-      default: return <Badge className="bg-slate-100 text-slate-700 hover:bg-slate-100 border-none">Draft</Badge>;
+      case "PAID": return <Badge className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 border-none">Paid</Badge>;
+      case "SENT": return <Badge className="bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 border-none">Sent</Badge>;
+      case "CANCELLED": return <Badge className="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 hover:bg-red-100 border-none">Cancelled</Badge>;
+      default: return <Badge className="bg-slate-100 dark:bg-gray-800 text-slate-700 dark:text-gray-300 hover:bg-slate-100 border-none">Draft</Badge>;
     }
   };
 
   if (view === "FORM") {
     return (
       <div className="space-y-6 max-w-6xl mx-auto pb-10">
-        <div className="flex items-center justify-between border-b pb-4">
+        <div className="flex items-center justify-between border-b dark:border-gray-800 pb-4">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" onClick={() => setView("LIST")}><ArrowLeft className="h-5 w-5" /></Button>
             <div className="flex items-center gap-4">
@@ -222,13 +222,13 @@ export default function InvoicesClient({ initialInvoices, companyDetails }: Prop
                 <img src={companyDetails.logoUrl} alt="Logo" className="h-12 w-auto object-contain" />
               )}
               <div>
-                <h1 className="text-2xl font-bold tracking-tight">Create {isQuotation ? "Quotation" : "Invoice"}</h1>
+                <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-100">Create {isQuotation ? "Quotation" : "Invoice"}</h1>
                 <p className="text-sm text-muted-foreground">Fill in the details below to generate a new document.</p>
               </div>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <div className="bg-muted p-1 rounded-lg flex items-center mr-4">
+            <div className="bg-muted dark:bg-gray-800 p-1 rounded-lg flex items-center mr-4">
               <Button size="sm" variant={!isQuotation ? "secondary" : "ghost"} onClick={() => setIsQuotation(false)}>Invoice</Button>
               <Button size="sm" variant={isQuotation ? "secondary" : "ghost"} onClick={() => setIsQuotation(true)}>Quotation</Button>
             </div>
@@ -248,27 +248,27 @@ export default function InvoicesClient({ initialInvoices, companyDetails }: Prop
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>Client Name <span className="text-destructive">*</span></Label>
-                    <Input required value={clientName} onChange={e => setClientName(e.target.value)} placeholder="Acme Corp" />
+                    <Input required value={clientName} onChange={e => setClientName(e.target.value)} placeholder="Acme Corp" className="dark:bg-gray-800 dark:border-gray-700" />
                   </div>
                   <div className="space-y-2">
                     <Label>Project Name</Label>
-                    <Input value={projectName} onChange={e => setProjectName(e.target.value)} placeholder="Website Redesign" />
+                    <Input value={projectName} onChange={e => setProjectName(e.target.value)} placeholder="Website Redesign" className="dark:bg-gray-800 dark:border-gray-700" />
                   </div>
                   <div className="space-y-2">
                     <Label>Email</Label>
-                    <Input type="email" value={clientEmail} onChange={e => setClientEmail(e.target.value)} placeholder="client@example.com" />
+                    <Input type="email" value={clientEmail} onChange={e => setClientEmail(e.target.value)} placeholder="client@example.com" className="dark:bg-gray-800 dark:border-gray-700" />
                   </div>
                   <div className="space-y-2">
                     <Label>Phone</Label>
-                    <Input value={clientPhone} onChange={e => setClientPhone(e.target.value)} placeholder="+91 9876543210" />
+                    <Input value={clientPhone} onChange={e => setClientPhone(e.target.value)} placeholder="+91 9876543210" className="dark:bg-gray-800 dark:border-gray-700" />
                   </div>
                   <div className="space-y-2 col-span-2">
                     <Label>Address</Label>
-                    <Textarea rows={2} value={clientAddress} onChange={e => setClientAddress(e.target.value)} placeholder="123 Business St..." />
+                    <Textarea rows={2} value={clientAddress} onChange={e => setClientAddress(e.target.value)} placeholder="123 Business St..." className="dark:bg-gray-800 dark:border-gray-700" />
                   </div>
                   <div className="space-y-2">
                     <Label>GSTIN (Optional)</Label>
-                    <Input value={clientGstin} onChange={e => setClientGstin(e.target.value)} placeholder="22AAAAA0000A1Z5" />
+                    <Input value={clientGstin} onChange={e => setClientGstin(e.target.value)} placeholder="22AAAAA0000A1Z5" className="dark:bg-gray-800 dark:border-gray-700" />
                   </div>
                 </div>
               </CardContent>
@@ -292,16 +292,16 @@ export default function InvoicesClient({ initialInvoices, companyDetails }: Prop
                   ))}
                 </div>
 
-                <div className="border rounded-xl overflow-hidden">
+                <div className="border dark:border-gray-800 rounded-xl overflow-hidden">
                   <Table>
-                    <TableHeader className="bg-muted/50">
-                      <TableRow>
-                        <TableHead>Service / Description</TableHead>
-                        <TableHead className="w-24">Cat</TableHead>
-                        <TableHead className="w-20">Qty</TableHead>
-                        <TableHead className="w-28">Rate (₹)</TableHead>
-                        <TableHead className="w-20">GST %</TableHead>
-                        <TableHead className="w-28 text-right">Total</TableHead>
+                    <TableHeader className="bg-muted/50 dark:bg-gray-800/50">
+                      <TableRow className="border-b dark:border-gray-800">
+                        <TableHead className="dark:text-gray-300">Service / Description</TableHead>
+                        <TableHead className="w-24 dark:text-gray-300">Cat</TableHead>
+                        <TableHead className="w-20 dark:text-gray-300">Qty</TableHead>
+                        <TableHead className="w-28 dark:text-gray-300">Rate (₹)</TableHead>
+                        <TableHead className="w-20 dark:text-gray-300">GST %</TableHead>
+                        <TableHead className="w-28 text-right dark:text-gray-300">Total</TableHead>
                         <TableHead className="w-12"></TableHead>
                       </TableRow>
                     </TableHeader>
@@ -336,7 +336,7 @@ export default function InvoicesClient({ initialInvoices, companyDetails }: Prop
                                 </SelectContent>
                              </Select>
                           </TableCell>
-                          <TableCell className="p-2 align-top text-right font-medium text-sm pt-4">
+                          <TableCell className="p-2 align-top text-right font-medium text-sm pt-4 dark:text-gray-300">
                             ₹{(item.qty * item.rate).toLocaleString('en-IN', {minimumFractionDigits: 2})}
                           </TableCell>
                           <TableCell className="p-2 align-top pt-3">
@@ -355,7 +355,7 @@ export default function InvoicesClient({ initialInvoices, companyDetails }: Prop
             <Card>
               <CardContent className="p-6">
                 <Label>Notes & Terms</Label>
-                <Textarea rows={3} value={notes} onChange={e => setNotes(e.target.value)} placeholder="Special terms, payment instructions, etc." className="mt-2" />
+                <Textarea rows={3} value={notes} onChange={e => setNotes(e.target.value)} placeholder="Special terms, payment instructions, etc." className="mt-2 dark:bg-gray-800 dark:border-gray-700" />
               </CardContent>
             </Card>
           </div>
@@ -367,11 +367,11 @@ export default function InvoicesClient({ initialInvoices, companyDetails }: Prop
                 <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Document Settings</h3>
                 <div className="space-y-2">
                   <Label>Issue Date</Label>
-                  <Input type="date" value={issueDate} onChange={e => setIssueDate(e.target.value)} />
+                  <Input type="date" value={issueDate} onChange={e => setIssueDate(e.target.value)} className="dark:bg-gray-800 dark:border-gray-700" />
                 </div>
                 <div className="space-y-2">
                   <Label>{isQuotation ? "Valid Until" : "Due Date"}</Label>
-                  <Input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} />
+                  <Input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} className="dark:bg-gray-800 dark:border-gray-700" />
                 </div>
               </CardContent>
             </Card>
@@ -387,7 +387,7 @@ export default function InvoicesClient({ initialInvoices, companyDetails }: Prop
                 
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-muted-foreground">Discount (%)</span>
-                  <Input type="number" min="0" max="100" value={discountPercent} onChange={e => setDiscountPercent(parseFloat(e.target.value)||0)} className="w-20 h-8 text-right bg-white" />
+                  <Input type="number" min="0" max="100" value={discountPercent} onChange={e => setDiscountPercent(parseFloat(e.target.value)||0)} className="w-20 h-8 text-right bg-white dark:bg-gray-800 dark:border-gray-700" />
                 </div>
                 {calculations.discountAmount > 0 && (
                   <div className="flex justify-between text-sm text-emerald-600">
@@ -435,53 +435,53 @@ export default function InvoicesClient({ initialInvoices, companyDetails }: Prop
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="bg-white border-l-4 border-l-primary shadow-sm hover:shadow-md transition-shadow">
+        <Card className="bg-white dark:bg-gray-900 border-l-4 border-l-primary dark:border-l-indigo-500 shadow-sm hover:shadow-md transition-shadow">
           <CardContent className="p-6">
             <div className="flex justify-between items-center">
               <p className="text-sm font-medium text-muted-foreground">Total Billed</p>
-              <IndianRupee className="h-4 w-4 text-primary" />
+              <IndianRupee className="h-4 w-4 text-primary dark:text-indigo-400" />
             </div>
-            <p className="text-2xl font-bold text-slate-800 mt-2">{formatMoney(metrics.billed)}</p>
+            <p className="text-2xl font-bold text-slate-800 dark:text-gray-100 mt-2">{formatMoney(metrics.billed)}</p>
           </CardContent>
         </Card>
-        <Card className="bg-white border-l-4 border-l-emerald-500 shadow-sm hover:shadow-md transition-shadow">
+        <Card className="bg-white dark:bg-gray-900 border-l-4 border-l-emerald-500 shadow-sm hover:shadow-md transition-shadow">
           <CardContent className="p-6">
             <div className="flex justify-between items-center">
               <p className="text-sm font-medium text-muted-foreground">Amount Paid</p>
               <IndianRupee className="h-4 w-4 text-emerald-500" />
             </div>
-            <p className="text-2xl font-bold text-emerald-600 mt-2">{formatMoney(metrics.paid)}</p>
+            <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-2">{formatMoney(metrics.paid)}</p>
           </CardContent>
         </Card>
-        <Card className="bg-white border-l-4 border-l-emerald-400 shadow-sm hover:shadow-md transition-shadow">
+        <Card className="bg-white dark:bg-gray-900 border-l-4 border-l-emerald-400 shadow-sm hover:shadow-md transition-shadow">
           <CardContent className="p-6">
             <div className="flex justify-between items-center">
               <p className="text-sm font-medium text-muted-foreground">Pending Payment</p>
               <IndianRupee className="h-4 w-4 text-emerald-400" />
             </div>
-            <p className="text-2xl font-bold text-emerald-500 mt-2">{formatMoney(metrics.pending)}</p>
+            <p className="text-2xl font-bold text-emerald-500 dark:text-emerald-300 mt-2">{formatMoney(metrics.pending)}</p>
           </CardContent>
         </Card>
-        <Card className="bg-white border-l-4 border-l-slate-400 shadow-sm hover:shadow-md transition-shadow">
+        <Card className="bg-white dark:bg-gray-900 border-l-4 border-l-slate-400 dark:border-l-gray-600 shadow-sm hover:shadow-md transition-shadow">
           <CardContent className="p-6">
             <div className="flex justify-between items-center">
               <p className="text-sm font-medium text-muted-foreground">Draft Documents</p>
-              <FileText className="h-4 w-4 text-slate-400" />
+              <FileText className="h-4 w-4 text-slate-400 dark:text-gray-500" />
             </div>
-            <p className="text-2xl font-bold text-slate-700 mt-2">{metrics.drafts}</p>
+            <p className="text-2xl font-bold text-slate-700 dark:text-gray-300 mt-2">{metrics.drafts}</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Filters and Search */}
-      <div className="flex flex-col sm:flex-row gap-4 items-center bg-white p-4 rounded-xl border shadow-sm">
+      <div className="flex flex-col sm:flex-row gap-4 items-center bg-white dark:bg-gray-900 p-4 rounded-xl border dark:border-gray-800 shadow-sm">
         <div className="relative flex-1 w-full">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input 
             placeholder="Search by client or invoice number..." 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 bg-muted/50 border-transparent focus-visible:bg-white"
+            className="pl-9 bg-muted/50 dark:bg-gray-800/50 border-transparent focus-visible:bg-white dark:focus-visible:bg-gray-800"
           />
         </div>
         <Select value={typeFilter} onValueChange={(val) => { if (val) setTypeFilter(val); }}>
@@ -493,7 +493,7 @@ export default function InvoicesClient({ initialInvoices, companyDetails }: Prop
           </SelectContent>
         </Select>
         <Select value={statusFilter} onValueChange={(val) => { if (val) setStatusFilter(val); }}>
-          <SelectTrigger className="w-[160px] bg-muted/50 border-transparent focus:bg-white"><SelectValue placeholder="Status" /></SelectTrigger>
+          <SelectTrigger className="w-[160px] bg-muted/50 dark:bg-gray-800/50 border-transparent focus:bg-white dark:focus:bg-gray-800"><SelectValue placeholder="Status" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="ALL">All Statuses</SelectItem>
             <SelectItem value="DRAFT">Draft</SelectItem>
@@ -505,16 +505,16 @@ export default function InvoicesClient({ initialInvoices, companyDetails }: Prop
       </div>
 
       {/* Table */}
-      <div className="rounded-xl border bg-white shadow-sm overflow-hidden">
+      <div className="rounded-xl border dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm overflow-hidden">
         <Table>
           <TableHeader>
-            <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
-              <TableHead className="font-semibold text-slate-600">Document</TableHead>
-              <TableHead className="font-semibold text-slate-600">Client / Project</TableHead>
-              <TableHead className="font-semibold text-slate-600">Date</TableHead>
-              <TableHead className="text-right font-semibold text-slate-600">Amount</TableHead>
-              <TableHead className="font-semibold text-slate-600">Status</TableHead>
-              <TableHead className="text-right font-semibold text-slate-600">Actions</TableHead>
+            <TableRow className="bg-slate-50/50 dark:bg-gray-800/30 hover:bg-slate-50/50 dark:hover:bg-gray-800/30">
+              <TableHead className="font-semibold text-slate-600 dark:text-gray-400">Document</TableHead>
+              <TableHead className="font-semibold text-slate-600 dark:text-gray-400">Client / Project</TableHead>
+              <TableHead className="font-semibold text-slate-600 dark:text-gray-400">Date</TableHead>
+              <TableHead className="text-right font-semibold text-slate-600 dark:text-gray-400">Amount</TableHead>
+              <TableHead className="font-semibold text-slate-600 dark:text-gray-400">Status</TableHead>
+              <TableHead className="text-right font-semibold text-slate-600 dark:text-gray-400">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -531,22 +531,22 @@ export default function InvoicesClient({ initialInvoices, companyDetails }: Prop
               </TableRow>
             ) : (
               filteredInvoices.map((inv) => (
-                <TableRow key={inv.id} className="hover:bg-slate-50/50 transition-colors">
+                <TableRow key={inv.id} className="hover:bg-slate-50/50 dark:hover:bg-gray-800/20 transition-colors border-b dark:border-gray-800">
                   <TableCell>
-                    <div className="font-medium text-slate-900">{inv.invoiceNumber}</div>
-                    <div className="text-[10px] uppercase font-bold tracking-wider text-slate-500 mt-1">
+                    <div className="font-medium text-slate-900 dark:text-gray-100">{inv.invoiceNumber}</div>
+                    <div className="text-[10px] uppercase font-bold tracking-wider text-slate-500 dark:text-gray-500 mt-1">
                       {inv.isQuotation ? "Quotation" : "Invoice"}
                     </div>
                   </TableCell>
                   <TableCell>
-                    <div className="font-medium text-slate-900">{inv.clientName}</div>
+                    <div className="font-medium text-slate-900 dark:text-gray-100">{inv.clientName}</div>
                     {inv.projectName && <div className="text-xs text-muted-foreground mt-0.5">{inv.projectName}</div>}
                   </TableCell>
                   <TableCell>
-                    <div className="text-sm">{format(new Date(inv.issueDate || inv.createdAt), "MMM dd, yyyy")}</div>
+                    <div className="text-sm dark:text-gray-300">{format(new Date(inv.issueDate || inv.createdAt), "MMM dd, yyyy")}</div>
                   </TableCell>
                   <TableCell className="text-right">
-                    <div className="font-semibold text-slate-900">{formatMoney(inv.totalAmount)}</div>
+                    <div className="font-semibold text-slate-900 dark:text-gray-100">{formatMoney(inv.totalAmount)}</div>
                   </TableCell>
                   <TableCell>
                     <Select value={inv.status} onValueChange={(val) => { if (val) updateStatus(inv.id, val); }}>

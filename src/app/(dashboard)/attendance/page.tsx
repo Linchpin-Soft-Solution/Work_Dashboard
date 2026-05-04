@@ -75,10 +75,10 @@ function todayValue() {
 // ─── Status Badge ─────────────────────────────────────────────────────────────
 function StatusBadge({ status }: { status: string }) {
   const map: Record<string, string> = {
-    PRESENT: "bg-emerald-100 text-emerald-700 border border-emerald-200",
-    LATE: "bg-amber-100 text-amber-700 border border-amber-200",
-    ABSENT: "bg-red-100 text-red-600 border border-red-200",
-    HOLIDAY: "bg-sky-100 text-sky-700 border border-sky-200",
+    PRESENT: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/50",
+    LATE: "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800/50",
+    ABSENT: "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800/50",
+    HOLIDAY: "bg-sky-100 dark:bg-sky-900/30 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-800/50",
   };
   return (
     <span
@@ -175,11 +175,11 @@ function EmployeeView({ userId }: { userId: string }) {
   return (
     <div className="space-y-6">
       {/* Today Card */}
-      <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+      <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-6 shadow-sm">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <p className="text-xs text-gray-400 uppercase tracking-wide font-medium">Today</p>
-            <h2 className="text-xl font-bold text-gray-800 mt-0.5">
+            <p className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wide font-medium">Today</p>
+            <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100 mt-0.5">
               {new Date().toLocaleDateString("en-IN", {
                 weekday: "long",
                 day: "numeric",
@@ -193,26 +193,26 @@ function EmployeeView({ userId }: { userId: string }) {
         </div>
 
         <div className="grid grid-cols-2 gap-4 mb-5">
-          <div className="bg-gray-50 rounded-xl p-3">
-            <p className="text-xs text-gray-400 mb-1">Check-in</p>
-            <p className="text-lg font-semibold text-gray-800">
+          <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-3">
+            <p className="text-xs text-gray-400 dark:text-gray-500 mb-1">Check-in</p>
+            <p className="text-lg font-semibold text-gray-800 dark:text-gray-100">
               {formatTime(todayRecord?.checkInTime ?? null)}
             </p>
           </div>
-          <div className="bg-gray-50 rounded-xl p-3">
-            <p className="text-xs text-gray-400 mb-1">Check-out</p>
-            <p className="text-lg font-semibold text-gray-800">
+          <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-3">
+            <p className="text-xs text-gray-400 dark:text-gray-500 mb-1">Check-out</p>
+            <p className="text-lg font-semibold text-gray-800 dark:text-gray-100">
               {formatTime(todayRecord?.checkOutTime ?? null)}
             </p>
           </div>
         </div>
 
         {todayRecord?.checkInLocation && (
-          <div className="flex items-start gap-2 bg-indigo-50 border border-indigo-100 rounded-xl px-4 py-3 mb-5">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-indigo-500 mt-0.5 shrink-0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <div className="flex items-start gap-2 bg-indigo-50 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/30 rounded-xl px-4 py-3 mb-5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-indigo-500 dark:text-indigo-400 mt-0.5 shrink-0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
             <div>
-              <p className="text-xs text-indigo-400 font-medium mb-0.5">Check-in Location</p>
-              <p className="text-sm font-medium text-indigo-700">{todayRecord.checkInLocation}</p>
+              <p className="text-xs text-indigo-400 dark:text-indigo-500 font-medium mb-0.5">Check-in Location</p>
+              <p className="text-sm font-medium text-indigo-700 dark:text-indigo-300">{todayRecord.checkInLocation}</p>
             </div>
           </div>
         )}
@@ -254,13 +254,13 @@ function EmployeeView({ userId }: { userId: string }) {
       </div>
 
       {/* Monthly Table */}
-      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-          <h3 className="font-semibold text-gray-800">Monthly History</h3>
+      <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800">
+          <h3 className="font-semibold text-gray-800 dark:text-gray-100">Monthly History</h3>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setMonth(prev => addMonths(prev + "-01", -1).slice(0, 7))}
-              className="p-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 transition"
+              className="p-1.5 rounded-lg border border-gray-200 dark:border-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
             </button>
@@ -313,7 +313,7 @@ function EmployeeView({ userId }: { userId: string }) {
             </Popover>
             <button
               onClick={() => setMonth(prev => addMonths(prev + "-01", 1).slice(0, 7))}
-              className="p-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 transition"
+              className="p-1.5 rounded-lg border border-gray-200 dark:border-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
             </button>
@@ -328,7 +328,7 @@ function EmployeeView({ userId }: { userId: string }) {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-gray-50 text-xs text-gray-500 uppercase tracking-wide">
+                <tr className="bg-gray-50 dark:bg-gray-800/50 text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">
                   <th className="px-5 py-3 text-left font-medium">Date</th>
                   <th className="px-5 py-3 text-left font-medium">Status</th>
                   <th className="px-5 py-3 text-left font-medium">Check-in</th>
@@ -339,22 +339,22 @@ function EmployeeView({ userId }: { userId: string }) {
                   <th className="px-5 py-3 text-left font-medium"></th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
                 {records.map((r) => (
-                  <tr key={r.id} className="hover:bg-gray-50/60 transition">
-                    <td className="px-5 py-3 text-gray-700">{formatDate(r.date)}</td>
+                  <tr key={r.id} className="hover:bg-gray-50/60 dark:hover:bg-gray-800/30 transition">
+                    <td className="px-5 py-3 text-gray-700 dark:text-gray-300">{formatDate(r.date)}</td>
                     <td className="px-5 py-3"><StatusBadge status={r.status} /></td>
-                    <td className="px-5 py-3 text-gray-600">{formatTime(r.checkInTime)}</td>
-                    <td className="px-5 py-3 text-gray-600">{formatTime(r.checkOutTime)}</td>
-                    <td className="px-5 py-3 text-gray-500 text-xs max-w-[180px]">
+                    <td className="px-5 py-3 text-gray-600 dark:text-gray-400">{formatTime(r.checkInTime)}</td>
+                    <td className="px-5 py-3 text-gray-600 dark:text-gray-400">{formatTime(r.checkOutTime)}</td>
+                    <td className="px-5 py-3 text-gray-500 dark:text-gray-500 text-xs max-w-[180px]">
                       {r.checkInLocation ? (
                         <span className="flex items-center gap-1">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-indigo-400 shrink-0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-indigo-400 dark:text-indigo-500 shrink-0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                           {r.checkInLocation}
                         </span>
                       ) : "—"}
                     </td>
-                    <td className="px-5 py-3 text-gray-600">{r.payMultiplier.toFixed(1)}×</td>
+                    <td className="px-5 py-3 text-gray-600 dark:text-gray-400">{r.payMultiplier.toFixed(1)}×</td>
                     <td className="px-5 py-3">
                       {r.dailyLogSubmitted ? (
                         <span className="text-emerald-600 font-medium">✓</span>
@@ -366,7 +366,7 @@ function EmployeeView({ userId }: { userId: string }) {
                       {r.overriddenByAdminId && (
                         <span
                           title={r.overrideReason ?? ""}
-                          className="text-xs bg-amber-50 text-amber-600 border border-amber-200 px-2 py-0.5 rounded-full cursor-help"
+                          className="text-xs bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800/50 px-2 py-0.5 rounded-full cursor-help"
                         >
                           Edited by Admin
                         </span>
@@ -473,9 +473,9 @@ function OverrideDialog({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 p-6">
-        <h3 className="font-bold text-gray-800 text-lg mb-1">Override Attendance</h3>
-        <p className="text-sm text-gray-500 mb-5">
+      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-md mx-4 p-6 border dark:border-gray-800">
+        <h3 className="font-bold text-gray-800 dark:text-gray-100 text-lg mb-1">Override Attendance</h3>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">
           {record.User.name} · {formatDate(record.date)}
         </p>
 
@@ -483,11 +483,11 @@ function OverrideDialog({
           {/* Status + Multiplier */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Status</label>
+              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Status</label>
               <select
                 value={status}
                 onChange={(e) => handleStatusChange(e.target.value as AttendanceRecord["status"])}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full border border-gray-200 dark:border-gray-800 rounded-lg px-3 py-2 text-sm text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
                 <option value="PRESENT">Present (×1.0)</option>
                 <option value="LATE">Late (×0.5)</option>
@@ -496,10 +496,10 @@ function OverrideDialog({
               </select>
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">
+              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
                 Pay Multiplier
                 {!multiplierTouched && (
-                  <span className="ml-1 text-gray-400 font-normal">(auto)</span>
+                  <span className="ml-1 text-gray-400 dark:text-gray-500 font-normal">(auto)</span>
                 )}
               </label>
               <input
@@ -512,7 +512,7 @@ function OverrideDialog({
                   setMultiplierTouched(true);
                   setMultiplier(e.target.value);
                 }}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full border border-gray-200 dark:border-gray-800 rounded-lg px-3 py-2 text-sm text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
             </div>
           </div>
@@ -520,40 +520,40 @@ function OverrideDialog({
           {/* Times */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Check-in (IST)</label>
+              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Check-in (IST)</label>
               <input
                 type="time"
                 value={checkIn}
                 onChange={(e) => setCheckIn(e.target.value)}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full border border-gray-200 dark:border-gray-800 rounded-lg px-3 py-2 text-sm text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Check-out (IST)</label>
+              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Check-out (IST)</label>
               <input
                 type="time"
                 value={checkOut}
                 onChange={(e) => setCheckOut(e.target.value)}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full border border-gray-200 dark:border-gray-800 rounded-lg px-3 py-2 text-sm text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
             </div>
           </div>
 
           {/* Daily Log toggle */}
-          <div className="flex items-center justify-between bg-gray-50 rounded-xl px-4 py-3">
+          <div className="flex items-center justify-between bg-gray-50 dark:bg-gray-800/50 rounded-xl px-4 py-3">
             <div>
-              <p className="text-sm font-medium text-gray-700">Daily Log Submitted</p>
-              <p className="text-xs text-gray-400 mt-0.5">Mark whether the employee's log was submitted</p>
+              <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Daily Log Submitted</p>
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Mark whether the employee's log was submitted</p>
             </div>
             <button
               type="button"
               onClick={() => setDailyLogSubmitted((v) => !v)}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
-                dailyLogSubmitted ? "bg-indigo-600" : "bg-gray-300"
+                dailyLogSubmitted ? "bg-indigo-600" : "bg-gray-300 dark:bg-gray-700"
               }`}
             >
               <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition ${
+                className={`inline-block h-4 w-4 transform rounded-full bg-white dark:bg-gray-100 shadow transition ${
                   dailyLogSubmitted ? "translate-x-6" : "translate-x-1"
                 }`}
               />
@@ -562,7 +562,7 @@ function OverrideDialog({
 
           {/* Reason */}
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">
+            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
               Reason <span className="text-red-500">*</span>
             </label>
             <textarea
@@ -570,12 +570,12 @@ function OverrideDialog({
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               placeholder="Explain why you are overriding this record…"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full border border-gray-200 dark:border-gray-800 rounded-lg px-3 py-2 text-sm text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-800 resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
 
           {err && (
-            <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+            <p className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/30 rounded-lg px-3 py-2">
               {err}
             </p>
           )}
@@ -584,7 +584,7 @@ function OverrideDialog({
         <div className="flex gap-3 mt-6">
           <button
             onClick={onClose}
-            className="flex-1 py-2.5 rounded-xl text-sm font-medium border border-gray-200 text-gray-600 hover:bg-gray-50 transition"
+            className="flex-1 py-2.5 rounded-xl text-sm font-medium border border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition"
           >
             Cancel
           </button>
@@ -665,13 +665,13 @@ function AdminView() {
       )}
 
       {/* Controls */}
-      <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm flex flex-wrap gap-4 items-center justify-between">
+      <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-5 shadow-sm flex flex-wrap gap-4 items-center justify-between">
         <div className="flex items-center gap-3">
-          <label className="text-sm font-medium text-gray-700">Date</label>
+          <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Date</label>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setDate(prev => addDays(prev, -1))}
-              className="p-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 transition"
+              className="p-1.5 rounded-lg border border-gray-200 dark:border-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
             </button>
@@ -704,7 +704,7 @@ function AdminView() {
             </Popover>
             <button
               onClick={() => setDate(prev => addDays(prev, 1))}
-              className="p-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 transition"
+              className="p-1.5 rounded-lg border border-gray-200 dark:border-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
             </button>
@@ -717,7 +717,7 @@ function AdminView() {
           <button
             onClick={markHoliday}
             disabled={holidayLoading}
-            className="px-4 py-2 rounded-xl text-sm font-medium bg-sky-50 text-sky-700 border border-sky-200 hover:bg-sky-100 disabled:opacity-50 transition"
+            className="px-4 py-2 rounded-xl text-sm font-medium bg-sky-50 dark:bg-sky-950/20 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-800/50 hover:bg-sky-100 dark:hover:bg-sky-900/40 disabled:opacity-50 transition"
           >
             {holidayLoading ? "Marking…" : "Mark as Holiday"}
           </button>
@@ -728,18 +728,18 @@ function AdminView() {
       {records.length > 0 && (
         <div className="flex gap-3 flex-wrap">
           {Object.entries(summary).map(([s, count]) => (
-            <div key={s} className="bg-white border border-gray-200 rounded-xl px-4 py-2 flex items-center gap-2 shadow-sm">
+            <div key={s} className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl px-4 py-2 flex items-center gap-2 shadow-sm">
               <StatusBadge status={s} />
-              <span className="text-sm font-semibold text-gray-700">{count}</span>
+              <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">{count}</span>
             </div>
           ))}
         </div>
       )}
 
       {/* Table */}
-      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-100">
-          <h3 className="font-semibold text-gray-800">
+      <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800">
+          <h3 className="font-semibold text-gray-800 dark:text-gray-100">
             Attendance —{" "}
             {new Date(date + "T00:00:00").toLocaleDateString("en-IN", {
               weekday: "long",
@@ -758,7 +758,7 @@ function AdminView() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-gray-50 text-xs text-gray-500 uppercase tracking-wide">
+                <tr className="bg-gray-50 dark:bg-gray-800/50 text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">
                   <th className="px-5 py-3 text-left font-medium">Employee</th>
                   <th className="px-5 py-3 text-left font-medium">Status</th>
                   <th className="px-5 py-3 text-left font-medium">Check-in</th>
@@ -770,27 +770,27 @@ function AdminView() {
                   <th className="px-5 py-3 text-left font-medium"></th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
                 {records.map((r) => (
-                  <tr key={r.id} className="hover:bg-gray-50/60 transition">
+                  <tr key={r.id} className="hover:bg-gray-50/60 dark:hover:bg-gray-800/30 transition">
                     <td className="px-5 py-3">
-                      <p className="font-medium text-gray-800">{r.User.name}</p>
+                      <p className="font-medium text-gray-800 dark:text-gray-100">{r.User.name}</p>
                       {r.User.designation && (
-                        <p className="text-xs text-gray-400">{r.User.designation}</p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500">{r.User.designation}</p>
                       )}
                     </td>
                     <td className="px-5 py-3"><StatusBadge status={r.status} /></td>
-                    <td className="px-5 py-3 text-gray-600">{formatTime(r.checkInTime)}</td>
-                    <td className="px-5 py-3 text-gray-600">{formatTime(r.checkOutTime)}</td>
-                    <td className="px-5 py-3 text-gray-500 text-xs max-w-[180px]">
+                    <td className="px-5 py-3 text-gray-600 dark:text-gray-400">{formatTime(r.checkInTime)}</td>
+                    <td className="px-5 py-3 text-gray-600 dark:text-gray-400">{formatTime(r.checkOutTime)}</td>
+                    <td className="px-5 py-3 text-gray-500 dark:text-gray-500 text-xs max-w-[180px]">
                       {r.checkInLocation ? (
                         <span className="flex items-center gap-1">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-indigo-400 shrink-0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-indigo-400 dark:text-indigo-500 shrink-0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                           {r.checkInLocation}
                         </span>
                       ) : "—"}
                     </td>
-                    <td className="px-5 py-3 text-gray-600">{r.payMultiplier.toFixed(1)}×</td>
+                    <td className="px-5 py-3 text-gray-600 dark:text-gray-400">{r.payMultiplier.toFixed(1)}×</td>
                     <td className="px-5 py-3">
                       {r.dailyLogSubmitted ? (
                         <span className="text-emerald-600 font-medium">✓</span>
@@ -845,8 +845,8 @@ export default function AttendancePage() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Attendance</h1>
-        <p className="text-sm text-gray-500 mt-1">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Attendance</h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
           {isAdmin
             ? "View and manage team attendance. Override records and mark holidays."
             : "Check in and out each day. Your attendance is tied to your pay."}
