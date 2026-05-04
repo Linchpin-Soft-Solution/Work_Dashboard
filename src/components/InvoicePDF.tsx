@@ -60,6 +60,7 @@ const styles = StyleSheet.create({
   notesText: { fontSize: 7, color: "#64748b", lineHeight: 1.3 },
 
   signArea: { marginTop: 20, alignItems: "flex-end" },
+  signature: { width: 100, height: 40, marginBottom: -15 },
   signLine: { width: 120, borderTop: "1px solid #1e293b", marginTop: 20, paddingTop: 2, textAlign: "center" },
   signText: { fontSize: 8, fontWeight: "bold", color: "#1e293b" },
 
@@ -237,7 +238,9 @@ export const InvoicePDF = ({ invoice, companyDetails }: InvoicePDFProps) => {
             <Text style={styles.notesText}>{invoice.notes || "Please process the payment within the due date. Thank you for your business!"}</Text>
             
             <View style={styles.signArea}>
-              {/* Sign goes here - Add  */}
+              {companyDetails.signatureUrl && (
+                <Image src={companyDetails.signatureUrl} style={styles.signature} />
+              )}
               <View style={styles.signLine}>
                 <Text style={styles.signText}>Authorised Signatory</Text>
               </View>

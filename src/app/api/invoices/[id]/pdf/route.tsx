@@ -25,6 +25,8 @@ export async function GET(
     if (!invoice) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
     const logoPath = path.join(process.cwd(), "public", "linchpin-logo.png");
+    const signPath = path.join(process.cwd(), "public", "sign.png");
+    
     let logoData = "";
     try {
       const buffer = fs.readFileSync(logoPath);
@@ -33,9 +35,20 @@ export async function GET(
       console.error("Logo not found at", logoPath);
     }
 
+    let signData = "";
+    try {
+      if (fs.existsSync(signPath)) {
+        const buffer = fs.readFileSync(signPath);
+        signData = `data:image/png;base64,${buffer.toString('base64')}`;
+      }
+    } catch (e) {
+      console.error("Signature not found at", signPath);
+    }
+
     const companyDetails = {
       name: "Linchpin Soft Solutions Private Limited",
       logoUrl: logoData,
+      signatureUrl: signData,
       address: "Begumpet, Hyderabad - 500016",
       email: "info@linchpinsoftsolution.com",
       phone: "+91 74163 93958",
