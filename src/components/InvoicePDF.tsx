@@ -237,6 +237,7 @@ export const InvoicePDF = ({ invoice, companyDetails }: InvoicePDFProps) => {
             <Text style={styles.notesText}>{invoice.notes || "Please process the payment within the due date. Thank you for your business!"}</Text>
             
             <View style={styles.signArea}>
+              {/* Sign goes here - Add  */}
               <View style={styles.signLine}>
                 <Text style={styles.signText}>Authorised Signatory</Text>
               </View>

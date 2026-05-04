@@ -18,32 +18,41 @@ export default async function DashboardPage() {
 
   let adminStats;
   let employeeStats;
-
-  const upcomingEvents = await prisma.calendarEvent.findMany({
-    where: {
-      startTime: { gte: today },
-      ...(role !== "ADMIN" ? { OR: [{ userId }, { isCompanyWide: true }] } : {})
-    },
-    orderBy: { startTime: 'asc' },
-    take: 5
-  });
-
-  const activeTargets = await prisma.target.findMany({
-    where: {
-      status: { in: ['PENDING', 'IN_PROGRESS', 'OVERDUE'] },
-      ...(role !== "ADMIN" ? { assignedToId: userId } : {})
-    },
-    orderBy: { dueDate: 'asc' },
-    take: 5,
-    include: {
-      User_Target_assignedToIdToUser: {
-        select: { name: true }
-      }
-    }
-  });
+  let upcomingEvents;
+  let activeTargets;
 
   if (role === "ADMIN") {
-    const [totalUsers, todaysAttendance, openTargets, openInvoices] = await Promise.all([
+    const [events, targets, totalUsers, todaysAttendance, openTargets, openInvoices] = await Promise.all([
+      prisma.calendarEvent.findMany({
+        where: {
+          startTime: { gte: today },
+        },
+        select: {
+          id: true,
+          title: true,
+          startTime: true,
+          endTime: true,
+          isCompanyWide: true,
+        },
+        orderBy: { startTime: 'asc' },
+        take: 5
+      }),
+      prisma.target.findMany({
+        where: {
+          status: { in: ['PENDING', 'IN_PROGRESS', 'OVERDUE'] },
+        },
+        select: {
+          id: true,
+          title: true,
+          priority: true,
+          dueDate: true,
+          User_Target_assignedToIdToUser: {
+            select: { name: true }
+          }
+        },
+        orderBy: { dueDate: 'asc' },
+        take: 5,
+      }),
       prisma.user.count({ where: { isActive: true } }),
       prisma.attendance.groupBy({
         by: ['status'],
@@ -53,6 +62,9 @@ export default async function DashboardPage() {
       prisma.target.count({ where: { status: { in: ['PENDING', 'IN_PROGRESS', 'OVERDUE'] } } }),
       prisma.invoice.count({ where: { status: { in: ['DRAFT', 'SENT'] } } })
     ]);
+
+    upcomingEvents = events;
+    activeTargets = targets;
 
     const presentToday = todaysAttendance.find(a => a.status === 'PRESENT')?._count || 0;
     const lateToday = todaysAttendance.find(a => a.status === 'LATE')?._count || 0;
@@ -67,17 +79,51 @@ export default async function DashboardPage() {
       openInvoices
     };
   } else {
-    const [attendance, openTargetsCount, dailyLog] = await Promise.all([
+    const [events, targets, attendance, openTargetsCount, dailyLog] = await Promise.all([
+      prisma.calendarEvent.findMany({
+        where: {
+          startTime: { gte: today },
+          OR: [{ userId }, { isCompanyWide: true }]
+        },
+        select: {
+          id: true,
+          title: true,
+          startTime: true,
+          endTime: true,
+          isCompanyWide: true,
+        },
+        orderBy: { startTime: 'asc' },
+        take: 5
+      }),
+      prisma.target.findMany({
+        where: {
+          status: { in: ['PENDING', 'IN_PROGRESS', 'OVERDUE'] },
+          assignedToId: userId
+        },
+        select: {
+          id: true,
+          title: true,
+          priority: true,
+          dueDate: true,
+        },
+        orderBy: { dueDate: 'asc' },
+        take: 5,
+      }),
       prisma.attendance.findFirst({
-        where: { userId, date: { gte: start, lte: end } }
+        where: { userId, date: { gte: start, lte: end } },
+        select: { status: true, dailyLogSubmitted: true }
       }),
       prisma.target.count({
         where: { assignedToId: userId, status: { in: ['PENDING', 'IN_PROGRESS', 'OVERDUE'] } }
       }),
       prisma.dailyLog.findFirst({
-        where: { userId, date: { gte: start, lte: end } }
+        where: { userId, date: { gte: start, lte: end } },
+        select: { id: true }
       })
     ]);
+
+    upcomingEvents = events;
+    activeTargets = targets;
 
     employeeStats = {
       attendanceToday: attendance?.status || null,

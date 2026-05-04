@@ -49,6 +49,8 @@ model Attendance {
   User User @relation(fields: [userId], references: [id])
 
   @@unique([userId, date])
+  @@index([date])
+  @@index([userId])
 }
 
 model DailyLog {
@@ -64,6 +66,8 @@ model DailyLog {
   User User @relation(fields: [userId], references: [id])
 
   @@unique([userId, date])
+  @@index([date])
+  @@index([userId])
 }
 
 model WeeklyLog {
@@ -109,6 +113,10 @@ model Target {
 
   User_Target_assignedByIdToUser User @relation("Target_assignedByIdToUser", fields: [assignedById], references: [id])
   User_Target_assignedToIdToUser User @relation("Target_assignedToIdToUser", fields: [assignedToId], references: [id])
+
+  @@index([status])
+  @@index([assignedToId])
+  @@index([dueDate])
 }
 
 model CalendarEvent {
@@ -124,6 +132,9 @@ model CalendarEvent {
   updatedAt     DateTime @updatedAt
 
   User User @relation(fields: [userId], references: [id])
+
+  @@index([startTime])
+  @@index([userId])
 }
 
 model Invoice {
@@ -153,6 +164,9 @@ model Invoice {
 
   User            User          @relation(fields: [createdById], references: [id])
   items           InvoiceItem[]
+
+  @@index([status])
+  @@index([createdById])
 }
 
 model InvoiceItem {
@@ -187,6 +201,8 @@ model PayRecord {
   PayAdjustment PayAdjustment[]
 
   @@unique([userId, month])
+  @@index([month])
+  @@index([userId])
 }
 
 model PayAdjustment {
