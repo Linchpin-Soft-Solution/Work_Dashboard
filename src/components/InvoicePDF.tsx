@@ -231,6 +231,14 @@ export const InvoicePDF = ({ invoice, companyDetails }: InvoicePDFProps) => {
                 <Text style={styles.bankValue}>{companyDetails.bank_address}</Text>
               </View>
             )}
+            <View style={{ marginTop: 8 }}>
+              <Text style={{ fontSize: 8, fontWeight: "bold", color: "#1e293b", marginBottom: 4 }}>
+                UPI: yespay.bizbiz225096@yesbankltd
+              </Text>
+              {companyDetails.qrUrl && (
+                <Image src={companyDetails.qrUrl} style={{ width: 80, height: 80, borderRadius: 4 }} />
+              )}
+            </View>
           </View>
 
           <View style={styles.notesBox}>

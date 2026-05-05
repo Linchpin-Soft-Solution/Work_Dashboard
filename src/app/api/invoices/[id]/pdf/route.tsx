@@ -45,6 +45,17 @@ export async function GET(
       console.error("Signature not found at", signPath);
     }
 
+    const qrPath = path.join(process.cwd(), "public", "QR.jpeg");
+    let qrData = "";
+    try {
+      if (fs.existsSync(qrPath)) {
+        const buffer = fs.readFileSync(qrPath);
+        qrData = `data:image/jpeg;base64,${buffer.toString('base64')}`;
+      }
+    } catch (e) {
+      console.error("QR not found at", qrPath);
+    }
+
     const companyDetails = {
       name: "Linchpin Soft Solutions Private Limited",
       logoUrl: logoData,
@@ -56,7 +67,8 @@ export async function GET(
       bank: "YES Bank",
       bank_account_number: "000663700003726",
       ifsc: "YESB0000006",
-      bank_address: "Raj Bhavan Road, Somajiguda, Hyderabad - 500082"
+      bank_address: "Raj Bhavan Road, Somajiguda, Hyderabad - 500082",
+      qrUrl: qrData
     };
 
     // Render the PDF to a Node stream
