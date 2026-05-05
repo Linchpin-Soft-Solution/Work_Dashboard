@@ -246,11 +246,12 @@ export const InvoicePDF = ({ invoice, companyDetails }: InvoicePDFProps) => {
             <Text style={styles.notesText}>{invoice.notes || "Please process the payment within the due date. Thank you for your business!"}</Text>
             
             <View style={styles.signArea}>
+              <Text style={[styles.signText, { marginBottom: 10 }]}>P.R. Narendra Babu</Text>
               {companyDetails.signatureUrl && (
                 <Image src={companyDetails.signatureUrl} style={styles.signature} />
               )}
               <View style={styles.signLine}>
-                <Text style={styles.signText}>Authorised Signatory</Text>
+                <Text style={{ fontSize: 7, color: "#64748b", marginTop: 2 }}>Authorised Signatory</Text>
               </View>
             </View>
           </View>
