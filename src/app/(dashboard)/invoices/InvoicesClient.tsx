@@ -66,6 +66,7 @@ export default function InvoicesClient({ initialInvoices, companyDetails }: Prop
   const [typeFilter, setTypeFilter] = useState("ALL");
 
   // Form State
+  const [editingInvoiceId, setEditingInvoiceId] = useState<string | null>(null);
   const [isQuotation, setIsQuotation] = useState(false);
   const [clientName, setClientName] = useState("");
   const [clientEmail, setClientEmail] = useState("");
@@ -146,6 +147,45 @@ export default function InvoicesClient({ initialInvoices, companyDetails }: Prop
     setClientName(""); setClientEmail(""); setClientPhone(""); setClientAddress(""); setClientGstin("");
     setProjectName(""); setIssueDate(format(new Date(), "yyyy-MM-dd")); setDueDate(""); setNotes(""); setDiscountPercent(0);
     setLineItems([{ name: "", description: "", category: "General", qty: 1, rate: 0, gstPercent: 18 }]);
+    setEditingInvoiceId(null);
+  };
+
+  const handleEdit = async (inv: Invoice) => {
+    const res = await fetch(`/api/invoices/${inv.id}`);
+    if (!res.ok) {
+      toast.error("Failed to load invoice details");
+      return;
+    }
+    const data = await res.json();
+    const fullInvoice = data.invoice;
+
+    setEditingInvoiceId(fullInvoice.id);
+    setIsQuotation(fullInvoice.isQuotation);
+    setClientName(fullInvoice.clientName || "");
+    setClientEmail(fullInvoice.clientEmail || "");
+    setClientPhone(fullInvoice.clientPhone || "");
+    setClientAddress(fullInvoice.clientAddress || "");
+    setClientGstin(fullInvoice.clientGstin || "");
+    setProjectName(fullInvoice.projectName || "");
+    setIssueDate(fullInvoice.issueDate ? format(new Date(fullInvoice.issueDate), "yyyy-MM-dd") : format(new Date(), "yyyy-MM-dd"));
+    setDueDate(fullInvoice.dueDate ? format(new Date(fullInvoice.dueDate), "yyyy-MM-dd") : "");
+    setNotes(fullInvoice.notes || "");
+    setDiscountPercent(fullInvoice.discountPercent || 0);
+
+    if (fullInvoice.items && fullInvoice.items.length > 0) {
+      setLineItems(fullInvoice.items.map((item: any) => ({
+        name: item.name,
+        description: item.description || "",
+        category: item.category || "General",
+        qty: item.qty,
+        rate: item.rate / 100, // convert back to float
+        gstPercent: item.gstPercent,
+      })));
+    } else {
+      setLineItems([{ name: "", description: "", category: "General", qty: 1, rate: 0, gstPercent: 18 }]);
+    }
+    
+    setView("FORM");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -154,8 +194,11 @@ export default function InvoicesClient({ initialInvoices, companyDetails }: Prop
     if (lineItems.some(i => !i.name)) { toast.error("All items must have a name"); return; }
     
     setLoading(true);
-    const res = await fetch("/api/invoices", {
-      method: "POST",
+    const method = editingInvoiceId ? "PUT" : "POST";
+    const url = editingInvoiceId ? `/api/invoices/${editingInvoiceId}` : "/api/invoices";
+
+    const res = await fetch(url, {
+      method,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         clientName, clientEmail, clientPhone, clientAddress, clientGstin,
@@ -168,8 +211,13 @@ export default function InvoicesClient({ initialInvoices, companyDetails }: Prop
     setLoading(false);
     
     if (res.ok) {
-      setInvoices([data.invoice, ...invoices]);
-      toast.success(`${isQuotation ? "Quotation" : "Invoice"} created successfully`);
+      if (editingInvoiceId) {
+        setInvoices(invoices.map(inv => inv.id === editingInvoiceId ? data.invoice : inv));
+        toast.success(`${isQuotation ? "Quotation" : "Invoice"} updated successfully`);
+      } else {
+        setInvoices([data.invoice, ...invoices]);
+        toast.success(`${isQuotation ? "Quotation" : "Invoice"} created successfully`);
+      }
       setView("LIST");
       resetForm();
     } else {
@@ -216,14 +264,14 @@ export default function InvoicesClient({ initialInvoices, companyDetails }: Prop
       <div className="space-y-6 max-w-6xl mx-auto pb-10">
         <div className="flex items-center justify-between border-b dark:border-gray-800 pb-4">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" onClick={() => setView("LIST")}><ArrowLeft className="h-5 w-5" /></Button>
+            <Button variant="ghost" size="icon" onClick={() => { setView("LIST"); resetForm(); }}><ArrowLeft className="h-5 w-5" /></Button>
             <div className="flex items-center gap-4">
               {companyDetails.logoUrl && (
                 <img src={companyDetails.logoUrl} alt="Logo" className="h-12 w-auto object-contain" />
               )}
               <div>
-                <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-100">Create {isQuotation ? "Quotation" : "Invoice"}</h1>
-                <p className="text-sm text-muted-foreground">Fill in the details below to generate a new document.</p>
+                <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-100">{editingInvoiceId ? "Edit" : "Create"} {isQuotation ? "Quotation" : "Invoice"}</h1>
+                <p className="text-sm text-muted-foreground">{editingInvoiceId ? "Update the details of this document." : "Fill in the details below to generate a new document."}</p>
               </div>
             </div>
           </div>
@@ -232,8 +280,8 @@ export default function InvoicesClient({ initialInvoices, companyDetails }: Prop
               <Button size="sm" variant={!isQuotation ? "secondary" : "ghost"} onClick={() => setIsQuotation(false)}>Invoice</Button>
               <Button size="sm" variant={isQuotation ? "secondary" : "ghost"} onClick={() => setIsQuotation(true)}>Quotation</Button>
             </div>
-            <Button variant="outline" onClick={() => setView("LIST")}>Cancel</Button>
-            <Button onClick={handleSubmit} disabled={loading}>{loading ? "Saving..." : "Save Document"}</Button>
+            <Button variant="outline" onClick={() => { setView("LIST"); resetForm(); }}>Cancel</Button>
+            <Button onClick={handleSubmit} disabled={loading}>{loading ? "Saving..." : (editingInvoiceId ? "Update Document" : "Save Document")}</Button>
           </div>
         </div>
 
@@ -563,6 +611,9 @@ export default function InvoicesClient({ initialInvoices, companyDetails }: Prop
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-1">
+                      <Button variant="ghost" size="icon" onClick={() => handleEdit(inv)} className="h-8 w-8 text-slate-500 hover:text-primary hover:bg-primary/10" title="Edit">
+                        <PenTool className="h-4 w-4" />
+                      </Button>
                       <Button variant="ghost" size="icon" onClick={() => window.open(`/api/invoices/${inv.id}/pdf`, '_blank')} className="h-8 w-8 text-slate-500 hover:text-primary hover:bg-primary/10" title="Download PDF">
                         <Download className="h-4 w-4" />
                       </Button>

@@ -73,7 +73,8 @@ export async function POST(req: NextRequest) {
       const qty = parseInt(item.qty, 10) || 1;
       const rateRupees = parseFloat(item.rate) || 0;
       const ratePaise = Math.round(rateRupees * 100);
-      const gstPercent = parseFloat(item.gstPercent) || 18.0;
+      const parsedGst = parseFloat(item.gstPercent);
+      const gstPercent = isNaN(parsedGst) ? 18.0 : parsedGst;
 
       const itemTotalPaise = qty * ratePaise;
       const itemGstPaise = Math.round(itemTotalPaise * (gstPercent / 100));
