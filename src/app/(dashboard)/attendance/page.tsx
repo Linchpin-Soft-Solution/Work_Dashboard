@@ -831,6 +831,7 @@ function AdminView() {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function AttendancePage() {
   const { data: session, status } = useSession();
+  const [activeTab, setActiveTab] = useState<"team" | "my">("team");
 
   if (status === "loading") {
     return (
@@ -844,17 +845,52 @@ export default function AttendancePage() {
 
   return (
     <div>
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Attendance</h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-          {isAdmin
-            ? "View and manage team attendance. Override records and mark holidays."
-            : "Check in and out each day. Your attendance is tied to your pay."}
-        </p>
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4 border-b border-gray-100 dark:border-gray-800 pb-5">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Attendance</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            {isAdmin
+              ? activeTab === "team"
+                ? "View and manage team attendance. Override records and mark holidays."
+                : "Check in and out each day. Your attendance is tied to your pay."
+              : "Check in and out each day. Your attendance is tied to your pay."}
+          </p>
+        </div>
+
+        {isAdmin && (
+          <div className="flex bg-gray-100 dark:bg-gray-800/60 p-1 rounded-xl w-fit border border-gray-200/60 dark:border-gray-800/80 shadow-sm self-start md:self-center">
+            <button
+              onClick={() => setActiveTab("team")}
+              className={cn(
+                "px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200",
+                activeTab === "team"
+                  ? "bg-white dark:bg-gray-900 text-indigo-600 dark:text-indigo-400 shadow-sm"
+                  : "text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
+              )}
+            >
+              Team Attendance
+            </button>
+            <button
+              onClick={() => setActiveTab("my")}
+              className={cn(
+                "px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200",
+                activeTab === "my"
+                  ? "bg-white dark:bg-gray-900 text-indigo-600 dark:text-indigo-400 shadow-sm"
+                  : "text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
+              )}
+            >
+              My Attendance
+            </button>
+          </div>
+        )}
       </div>
 
       {isAdmin ? (
-        <AdminView />
+        activeTab === "team" ? (
+          <AdminView />
+        ) : (
+          <EmployeeView userId={session?.user.id ?? ""} />
+        )
       ) : (
         <EmployeeView userId={session?.user.id ?? ""} />
       )}
