@@ -137,7 +137,18 @@ export default function CalendarClient({ session, users }: Props) {
     setFormSaving(true); setFormErr("");
     const method = editingEvent ? "PATCH" : "POST";
     const url = editingEvent ? `/api/calendar/${editingEvent.id}` : "/api/calendar";
-    const res = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) });
+
+    const payload = {
+      ...form,
+      startTime: new Date(form.startTime).toISOString(),
+      endTime: new Date(form.endTime).toISOString(),
+    };
+
+    const res = await fetch(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
     const data = await res.json();
     setFormSaving(false);
     if (!res.ok) { setFormErr(data.error || "Failed to save event."); }
