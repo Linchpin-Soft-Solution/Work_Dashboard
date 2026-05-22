@@ -214,9 +214,20 @@ function PayRecordCard({ record, isAdmin, onUpdated }: {
             </p>
           )}
         </div>
-        <div className="text-right">
-          <p className="text-xs text-gray-400 dark:text-gray-500">Final Pay</p>
-          <p className="text-xl font-bold text-indigo-600 dark:text-indigo-400">{fmt(record.finalPay)}</p>
+        <div className="flex flex-col items-end gap-2">
+          <div className="text-right">
+            <p className="text-xs text-gray-400 dark:text-gray-500">Final Pay</p>
+            <p className="text-xl font-bold text-indigo-600 dark:text-indigo-400">{fmt(record.finalPay)}</p>
+          </div>
+          <a
+            href={`/api/pay-records/${record.id}/pdf`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/40 px-3 py-1.5 rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition"
+          >
+            <Download className="h-3.5 w-3.5" />
+            Download Payslip
+          </a>
         </div>
       </div>
 
@@ -471,12 +482,22 @@ function AdminView({ users }: { users: User[] }) {
                     <td className="px-5 py-3 text-right text-gray-600 dark:text-gray-400">{fmt(r.calculatedPay)}</td>
                     <td className="px-5 py-3 text-right font-bold text-indigo-600 dark:text-indigo-400">{fmt(r.finalPay)}</td>
                     <td className="px-5 py-3 text-center">
-                      <button 
-                        onClick={() => setAddingAdjForRecordId(r.id)}
-                        className="inline-flex items-center gap-1.5 text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/30 px-3 py-1.5 rounded-lg border border-indigo-100 dark:border-indigo-900/40 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition"
-                      >
-                        <Plus className="h-3.5 w-3.5" /> Add Adj
-                      </button>
+                      <div className="flex items-center justify-center gap-2">
+                        <button 
+                          onClick={() => setAddingAdjForRecordId(r.id)}
+                          className="inline-flex items-center gap-1.5 text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/30 px-3 py-1.5 rounded-lg border border-indigo-100 dark:border-indigo-900/40 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition"
+                        >
+                          <Plus className="h-3.5 w-3.5" /> Add Adj
+                        </button>
+                        <a
+                          href={`/api/pay-records/${r.id}/pdf`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 px-3 py-1.5 rounded-lg border border-emerald-200 dark:border-emerald-900/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition"
+                        >
+                          <Download className="h-3.5 w-3.5" /> PDF
+                        </a>
+                      </div>
                     </td>
                   </tr>
                 ))}
