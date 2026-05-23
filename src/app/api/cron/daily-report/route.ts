@@ -2,16 +2,30 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { generateDailyReportSummary } from "@/lib/openrouter";
 import { Resend } from "resend";
+import { todayIST } from "@/lib/utils";
+
+export const dynamic = "force-dynamic";
 
 export async function GET(req: Request) {
   try {
     const authHeader = req.headers.get("Authorization");
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-      return new Response("Unauthorized", { status: 401 });
+    
+    // In development environments, we bypass the CRON_SECRET check for easier local testing.
+    if (process.env.NODE_ENV === "production") {
+      if (!process.env.CRON_SECRET) {
+        console.error("Daily-Report Cron Error: CRON_SECRET is not defined in environment variables on Vercel.");
+        return new Response("Unauthorized: CRON_SECRET is missing", { status: 401 });
+      }
+
+      if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+        console.error("Daily-Report Cron Error: Invalid Authorization header.");
+        return new Response("Unauthorized", { status: 401 });
+      }
+    } else {
+      console.log("Daily-Report Cron: Bypassing authentication check in development mode.");
     }
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const today = todayIST();
 
     const nextDay = new Date(today);
     nextDay.setDate(nextDay.getDate() + 1);

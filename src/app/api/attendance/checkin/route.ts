@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
+import { todayIST } from "@/lib/utils";
 
 function getISTHour(): { hour: number; minute: number } {
   // IST = UTC+5:30
@@ -10,15 +11,6 @@ function getISTHour(): { hour: number; minute: number } {
   const istMs = utcMs + 5.5 * 60 * 60 * 1000;
   const ist = new Date(istMs);
   return { hour: ist.getHours(), minute: ist.getMinutes() };
-}
-
-function todayIST(): Date {
-  const now = new Date();
-  const utcMs = now.getTime() + now.getTimezoneOffset() * 60000;
-  const istMs = utcMs + 5.5 * 60 * 60 * 1000;
-  const ist = new Date(istMs);
-  // Return midnight IST as UTC date
-  return new Date(Date.UTC(ist.getFullYear(), ist.getMonth(), ist.getDate()));
 }
 
 export async function POST(req: Request) {

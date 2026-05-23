@@ -1,14 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-
-function todayIST(): Date {
-  const now = new Date();
-  const utcMs = now.getTime() + now.getTimezoneOffset() * 60000;
-  const istMs = utcMs + 5.5 * 60 * 60 * 1000;
-  const ist = new Date(istMs);
-  return new Date(Date.UTC(ist.getFullYear(), ist.getMonth(), ist.getDate()));
-}
+import { todayIST } from "@/lib/utils";
 
 export async function POST() {
   const session = await auth();
