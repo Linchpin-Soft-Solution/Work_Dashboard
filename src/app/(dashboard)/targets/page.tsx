@@ -11,7 +11,13 @@ export default async function TargetsPage() {
   
   if (isAdmin) {
     users = await prisma.user.findMany({
-      where: { isActive: true, role: { in: ["EMPLOYEE", "INTERN"] } },
+      where: {
+        isActive: true,
+        OR: [
+          { role: { in: ["EMPLOYEE", "INTERN"] } },
+          { id: session.user.id }
+        ],
+      },
       select: { id: true, name: true, designation: true },
       orderBy: { name: "asc" },
     });

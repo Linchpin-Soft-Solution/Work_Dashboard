@@ -56,22 +56,32 @@ export async function POST(req: NextRequest) {
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const isAdmin = session.user.role === "ADMIN";
-  if (!isAdmin) {
-    return NextResponse.json({ error: "Forbidden: Only admins can assign targets" }, { status: 403 });
+  const isEmployeeOrIntern = session.user.role === "EMPLOYEE" || session.user.role === "INTERN";
+
+  if (!isAdmin && !isEmployeeOrIntern) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
   try {
     const body = await req.json();
     const { assignedToId, title, description, priority, timeframe, dueDate } = body;
 
-    if (!assignedToId || !title) {
-      return NextResponse.json({ error: "assignedToId and title are required" }, { status: 400 });
+    let finalAssignedToId = assignedToId;
+    if (!isAdmin) {
+      // Non-admins can only create targets for themselves
+      finalAssignedToId = session.user.id;
+    } else if (!finalAssignedToId) {
+      return NextResponse.json({ error: "assignedToId is required" }, { status: 400 });
+    }
+
+    if (!title) {
+      return NextResponse.json({ error: "title is required" }, { status: 400 });
     }
 
     const target = await prisma.target.create({
       data: {
         assignedById: session.user.id,
-        assignedToId,
+        assignedToId: finalAssignedToId,
         title,
         description: description || null,
         priority: priority || "MEDIUM",

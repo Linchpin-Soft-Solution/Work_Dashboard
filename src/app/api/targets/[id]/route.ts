@@ -25,25 +25,30 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
 
     const isAdmin = session.user.role === "ADMIN";
     const isAssignee = existingTarget.assignedToId === session.user.id;
+    const isCreator = existingTarget.assignedById === session.user.id;
 
-    if (!isAdmin && !isAssignee) {
+    if (!isAdmin && !isAssignee && !isCreator) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const body = await req.json();
     const updateData: any = {};
 
-    if (isAdmin) {
-      // Admins can update anything
+    if (isAdmin || isCreator) {
+      // Admins and Creators can update most fields
       if (body.title !== undefined) updateData.title = body.title;
       if (body.description !== undefined) updateData.description = body.description;
       if (body.priority !== undefined) updateData.priority = body.priority;
       if (body.timeframe !== undefined) updateData.timeframe = body.timeframe;
       if (body.dueDate !== undefined) updateData.dueDate = body.dueDate ? new Date(body.dueDate) : null;
       if (body.status !== undefined) updateData.status = body.status;
-      if (body.assignedToId !== undefined) updateData.assignedToId = body.assignedToId;
+      
+      // Only admins can change who the target is assigned to
+      if (isAdmin && body.assignedToId !== undefined) {
+        updateData.assignedToId = body.assignedToId;
+      }
     } else {
-      // Employees can ONLY update status
+      // Employees who are NOT creators (i.e., only assignees) can ONLY update status
       if (body.status !== undefined) {
         // Can only transition to valid states
         const allowedStatuses: TargetStatus[] = ["PENDING", "IN_PROGRESS", "COMPLETED"];
@@ -54,7 +59,6 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
         }
       }
 
-      // If they try to update something else, we ignore it or return error, but ignoring is safer.
       if (Object.keys(updateData).length === 0 && Object.keys(body).length > 0) {
           return NextResponse.json({ error: "Employees can only update target status" }, { status: 403 });
       }
@@ -97,10 +101,6 @@ export async function DELETE(req: NextRequest, { params }: RouteParams) {
   const session = await auth();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  if (session.user.role !== "ADMIN") {
-    return NextResponse.json({ error: "Forbidden: Only admins can delete targets" }, { status: 403 });
-  }
-
   const { id: targetId } = await params;
 
   try {
@@ -110,6 +110,13 @@ export async function DELETE(req: NextRequest, { params }: RouteParams) {
 
     if (!existingTarget) {
       return NextResponse.json({ error: "Target not found" }, { status: 404 });
+    }
+
+    const isAdmin = session.user.role === "ADMIN";
+    const isCreator = existingTarget.assignedById === session.user.id;
+
+    if (!isAdmin && !isCreator) {
+      return NextResponse.json({ error: "Forbidden: You do not have permission to delete this target" }, { status: 403 });
     }
 
     await prisma.target.delete({

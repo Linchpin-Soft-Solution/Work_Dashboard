@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { ClockIcon, EditIcon, PlusIcon, TrashIcon, Loader2 } from "lucide-react";
+import { ClockIcon, EditIcon, PlusIcon, TrashIcon, Loader2, LayoutGrid, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 // --- Types ---
@@ -51,7 +51,7 @@ function StatusBadge({ status }: { status: TargetStatus }) {
   };
   const label = status.replace("_", " ");
   return (
-    <Badge variant={variantMap[status]} className="text-xs">
+    <Badge variant={variantMap[status]} className="text-xs font-medium">
       {label}
     </Badge>
   );
@@ -69,6 +69,9 @@ export default function TargetsClient({
   const [targets, setTargets] = useState<Target[]>([]);
   const [loading, setLoading] = useState(false);
   const { confirm, ConfirmDialog } = useConfirm();
+
+  // Navigation / View state
+  const [viewMode, setViewMode] = useState<"kanban" | "list">(isAdmin ? "list" : "kanban");
 
   // Filters
   const [filterUser, setFilterUser] = useState<string>("all");
@@ -97,11 +100,16 @@ export default function TargetsClient({
     if (filterUser && filterUser !== "all") url += `&assignedToId=${filterUser}`;
     if (filterStatus && filterStatus !== "all") url += `&status=${filterStatus}`;
     
-    const res = await fetch(url);
-    const data = await res.json();
-    setLoading(false);
-    if (data.targets) {
-      setTargets(data.targets);
+    try {
+      const res = await fetch(url);
+      const data = await res.json();
+      if (data.targets) {
+        setTargets(data.targets);
+      }
+    } catch (err) {
+      toast.error("Failed to load targets.");
+    } finally {
+      setLoading(false);
     }
   }, [filterUser, filterStatus]);
 
@@ -112,7 +120,7 @@ export default function TargetsClient({
   const openNewModal = () => {
     setEditingTarget(null);
     setFormData({
-      assignedToId: users.length > 0 ? users[0].id : "",
+      assignedToId: isAdmin ? (users.length > 0 ? users[0].id : "") : session.user.id,
       title: "",
       description: "",
       priority: "MEDIUM",
@@ -155,20 +163,25 @@ export default function TargetsClient({
     const method = editingTarget ? "PATCH" : "POST";
     const url = editingTarget ? `/api/targets/${editingTarget.id}` : "/api/targets";
 
-    const res = await fetch(url, {
-      method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    });
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
 
-    const data = await res.json();
-    setFormSaving(false);
-
-    if (!res.ok) {
-      setFormErr(data.error || "Failed to save target.");
-    } else {
-      setIsModalOpen(false);
-      fetchTargets();
+      const data = await res.json();
+      if (!res.ok) {
+        setFormErr(data.error || "Failed to save target.");
+      } else {
+        toast.success(editingTarget ? "Target updated successfully" : "Target created successfully");
+        setIsModalOpen(false);
+        fetchTargets();
+      }
+    } catch (err) {
+      setFormErr("A network error occurred.");
+    } finally {
+      setFormSaving(false);
     }
   };
 
@@ -178,6 +191,7 @@ export default function TargetsClient({
     
     const res = await fetch(`/api/targets/${id}`, { method: "DELETE" });
     if (res.ok) {
+      toast.success("Target deleted successfully.");
       fetchTargets();
     } else {
       toast.error("Failed to delete target.");
@@ -191,7 +205,10 @@ export default function TargetsClient({
       body: JSON.stringify({ status: newStatus }),
     });
     if (res.ok) {
+      toast.success("Status updated successfully.");
       fetchTargets();
+    } else {
+      toast.error("Failed to update status.");
     }
   };
 
@@ -217,6 +234,7 @@ export default function TargetsClient({
       setTargets(prevTargets);
       toast.error("Failed to update status.");
     } else {
+      toast.success("Status updated.");
       fetchTargets();
     }
   };
@@ -233,7 +251,7 @@ export default function TargetsClient({
         {columns.map(col => (
           <div 
             key={col.defaultStatus} 
-            className="bg-muted/40 rounded-xl border border-muted p-4 min-h-[500px] min-w-[280px]"
+            className="bg-muted/40 rounded-xl border border-muted/80 p-4 min-h-[500px] min-w-[280px]"
             onDragOver={(e) => e.preventDefault()}
             onDrop={(e) => handleDrop(e, col.defaultStatus)}
           >
@@ -241,17 +259,49 @@ export default function TargetsClient({
             <div className="space-y-4">
               {targets.filter(t => col.statuses.includes(t.status)).map(t => {
                 const isOverdue = t.status === "OVERDUE" || (t.status !== "COMPLETED" && t.dueDate && new Date(t.dueDate).setHours(23, 59, 59, 999) < new Date().getTime());
+                const displayStatus = isOverdue ? "OVERDUE" : t.status;
+                const canEdit = isAdmin || t.assignedToId === session.user.id || t.assignedById === session.user.id;
+                const canDelete = isAdmin || t.assignedById === session.user.id;
+
                 return (
                   <Card 
                     key={t.id} 
                     draggable
                     onDragStart={(e) => handleDragStart(e, t.id)}
-                    className={`cursor-grab active:cursor-grabbing mb-4 ${isOverdue ? "border-destructive/50" : ""}`}
+                    className={`cursor-grab active:cursor-grabbing hover:shadow-md transition-all duration-200 ${isOverdue ? "border-destructive/40 shadow-sm shadow-destructive/5" : ""}`}
                   >
                     <CardContent className="p-4">
                       <div className="flex justify-between items-start mb-2">
                         <PriorityBadge priority={t.priority} />
-                        <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">{t.timeframe}</span>
+                        <div className="flex items-center gap-1">
+                          <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest mr-1.5">{t.timeframe}</span>
+                          {canEdit && (
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-6 w-6 p-0 hover:bg-muted" 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openEditModal(t);
+                              }}
+                            >
+                              <EditIcon className="h-3 w-3 text-muted-foreground hover:text-primary" />
+                            </Button>
+                          )}
+                          {canDelete && (
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-6 w-6 p-0 hover:bg-muted text-destructive/80 hover:text-destructive" 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                deleteTarget(t.id);
+                              }}
+                            >
+                              <TrashIcon className="h-3 w-3" />
+                            </Button>
+                          )}
+                        </div>
                       </div>
                       <h4 className="font-semibold text-foreground leading-tight mb-1">{t.title}</h4>
                       {t.description && <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{t.description}</p>}
@@ -273,7 +323,7 @@ export default function TargetsClient({
                             </Button>
                           )}
                           {(t.status === "COMPLETED" || t.status === "OVERDUE") && (
-                             <StatusBadge status={t.status} />
+                             <StatusBadge status={displayStatus} />
                           )}
                         </div>
                       </div>
@@ -293,33 +343,8 @@ export default function TargetsClient({
 
   const renderTable = () => (
     <Card className="shadow-sm">
-      <CardHeader className="p-4 border-b border-border flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <CardTitle className="text-lg">All Targets</CardTitle>
-        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-          <Select value={filterUser} onValueChange={(val) => { if (val) setFilterUser(val); }}>
-            <SelectTrigger className="w-full sm:w-[180px]">
-              <SelectValue placeholder="All Employees">
-                {filterUser === "all" ? "All Employees" : users.find(u => u.id === filterUser)?.name}
-              </SelectValue>
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Employees</SelectItem>
-              {users.map(u => <SelectItem key={u.id} value={u.id}>{u.name}</SelectItem>)}
-            </SelectContent>
-          </Select>
-          <Select value={filterStatus} onValueChange={(val) => { if (val) setFilterStatus(val); }}>
-            <SelectTrigger className="w-full sm:w-[180px]">
-              <SelectValue placeholder="All Statuses" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Statuses</SelectItem>
-              <SelectItem value="PENDING">Pending</SelectItem>
-              <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
-              <SelectItem value="COMPLETED">Completed</SelectItem>
-              <SelectItem value="OVERDUE">Overdue</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+      <CardHeader className="p-4 border-b border-border">
+        <CardTitle className="text-lg">Targets List</CardTitle>
       </CardHeader>
       <CardContent className="p-0">
         {loading ? (
@@ -336,6 +361,7 @@ export default function TargetsClient({
                 <TableRow>
                   <TableHead>Title</TableHead>
                   <TableHead>Assignee</TableHead>
+                  <TableHead>Assigned By</TableHead>
                   <TableHead>Priority</TableHead>
                   <TableHead>Due Date</TableHead>
                   <TableHead>Status</TableHead>
@@ -346,27 +372,43 @@ export default function TargetsClient({
                 {targets.map(t => {
                   const isOverdue = t.status === "OVERDUE" || (t.status !== "COMPLETED" && t.dueDate && new Date(t.dueDate).setHours(23, 59, 59, 999) < new Date().getTime());
                   const displayStatus = isOverdue ? "OVERDUE" : t.status;
+                  const canEdit = isAdmin || t.assignedToId === session.user.id || t.assignedById === session.user.id;
+                  const canDelete = isAdmin || t.assignedById === session.user.id;
+
                   return (
-                  <TableRow key={t.id}>
-                    <TableCell>
-                      <div className="font-medium">{t.title}</div>
-                      <div className="text-xs text-muted-foreground">{t.timeframe}</div>
-                    </TableCell>
-                    <TableCell>{t.User_Target_assignedToIdToUser.name}</TableCell>
-                    <TableCell><PriorityBadge priority={t.priority} /></TableCell>
-                    <TableCell>{t.dueDate ? new Date(t.dueDate).toLocaleDateString() : "—"}</TableCell>
-                    <TableCell><StatusBadge status={displayStatus} /></TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button variant="ghost" size="icon" onClick={() => openEditModal(t)}>
-                          <EditIcon className="h-4 w-4 text-muted-foreground hover:text-primary" />
-                        </Button>
-                        <Button variant="ghost" size="icon" onClick={() => deleteTarget(t.id)}>
-                          <TrashIcon className="h-4 w-4 text-destructive/80 hover:text-destructive" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
+                    <TableRow key={t.id}>
+                      <TableCell>
+                        <div className="font-medium">{t.title}</div>
+                        <div className="text-xs text-muted-foreground">{t.timeframe}</div>
+                      </TableCell>
+                      <TableCell>
+                        {t.assignedToId === session.user.id ? (
+                          <span className="font-medium text-primary">Me</span>
+                        ) : (
+                          t.User_Target_assignedToIdToUser?.name || "—"
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {t.assignedById === session.user.id ? "Me" : (t.User_Target_assignedByIdToUser?.name || "—")}
+                      </TableCell>
+                      <TableCell><PriorityBadge priority={t.priority} /></TableCell>
+                      <TableCell>{t.dueDate ? new Date(t.dueDate).toLocaleDateString() : "—"}</TableCell>
+                      <TableCell><StatusBadge status={displayStatus} /></TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          {canEdit && (
+                            <Button variant="ghost" size="icon" onClick={() => openEditModal(t)}>
+                              <EditIcon className="h-4 w-4 text-muted-foreground hover:text-primary" />
+                            </Button>
+                          )}
+                          {canDelete && (
+                            <Button variant="ghost" size="icon" onClick={() => deleteTarget(t.id)}>
+                              <TrashIcon className="h-4 w-4 text-destructive/80 hover:text-destructive" />
+                            </Button>
+                          )}
+                        </div>
+                      </TableCell>
+                    </TableRow>
                   );
                 })}
               </TableBody>
@@ -379,26 +421,99 @@ export default function TargetsClient({
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">Targets</h1>
-          <p className="text-sm text-muted-foreground mt-1">
+      {/* Top Header Section */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex flex-col gap-1.5">
+          <div className="flex items-center gap-3 flex-wrap">
+            <h1 className="text-2xl font-bold tracking-tight text-foreground">Targets</h1>
+            <Button 
+              size="sm" 
+              onClick={openNewModal} 
+              className="h-8 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-1.5 shadow-sm transition-all duration-200"
+            >
+              <PlusIcon className="h-3.5 w-3.5" />
+              <span>Create Target</span>
+            </Button>
+          </div>
+          <p className="text-sm text-muted-foreground">
             {isAdmin ? "Assign and track team targets." : "Manage your daily, weekly, and monthly goals."}
           </p>
         </div>
-        {isAdmin && (
-          <Button onClick={openNewModal} className="w-full sm:w-auto">
-            <PlusIcon className="h-4 w-4 mr-2" /> Assign Target
-          </Button>
-        )}
+
+        {/* View Switcher Controls */}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center bg-muted/65 p-1 rounded-lg border border-border/80 shadow-inner">
+            <Button
+              variant={viewMode === "kanban" ? "secondary" : "ghost"}
+              size="sm"
+              className={`h-7 px-3 text-xs gap-1.5 rounded-md transition-all ${viewMode === "kanban" ? "shadow-sm bg-background text-foreground font-medium" : "text-muted-foreground hover:text-foreground"}`}
+              onClick={() => setViewMode("kanban")}
+            >
+              <LayoutGrid className="h-3.5 w-3.5" />
+              <span>Kanban</span>
+            </Button>
+            <Button
+              variant={viewMode === "list" ? "secondary" : "ghost"}
+              size="sm"
+              className={`h-7 px-3 text-xs gap-1.5 rounded-md transition-all ${viewMode === "list" ? "shadow-sm bg-background text-foreground font-medium" : "text-muted-foreground hover:text-foreground"}`}
+              onClick={() => setViewMode("list")}
+            >
+              <List className="h-3.5 w-3.5" />
+              <span>List</span>
+            </Button>
+          </div>
+        </div>
       </div>
 
-      {isAdmin ? renderTable() : renderKanban()}
+      {/* Shared Filter Bar */}
+      {(isAdmin || viewMode === "list") && (
+        <div className="flex flex-wrap gap-3 items-center justify-start bg-muted/30 p-3 rounded-lg border border-border/60">
+          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mr-1">Filters:</span>
+          {isAdmin && (
+            <Select value={filterUser} onValueChange={(val) => { if (val) setFilterUser(val); }}>
+              <SelectTrigger className="w-full sm:w-[200px] bg-background">
+                <SelectValue placeholder="All Employees">
+                  {filterUser === "all" ? "All Users" : (filterUser === session.user.id ? "Me (Admin)" : users.find(u => u.id === filterUser)?.name)}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Users</SelectItem>
+                {users.map(u => (
+                  <SelectItem key={u.id} value={u.id}>
+                    {u.id === session.user.id ? `${u.name} (Me)` : u.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+          {viewMode === "list" && (
+            <Select value={filterStatus} onValueChange={(val) => { if (val) setFilterStatus(val); }}>
+              <SelectTrigger className="w-full sm:w-[180px] bg-background">
+                <SelectValue placeholder="All Statuses" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Statuses</SelectItem>
+                <SelectItem value="PENDING">Pending</SelectItem>
+                <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
+                <SelectItem value="COMPLETED">Completed</SelectItem>
+                <SelectItem value="OVERDUE">Overdue</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
+        </div>
+      )}
+
+      {/* Targets Main Panels */}
+      {viewMode === "kanban" ? renderKanban() : renderTable()}
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="sm:max-w-[500px] overflow-y-auto max-h-[90vh]">
           <DialogHeader>
-            <DialogTitle>{editingTarget ? "Edit Target" : "Assign New Target"}</DialogTitle>
+            <DialogTitle>
+              {editingTarget 
+                ? (isAdmin || editingTarget.assignedById === session.user.id ? "Edit Target" : "Update Target Status")
+                : "Create New Target"}
+            </DialogTitle>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
@@ -408,6 +523,7 @@ export default function TargetsClient({
                 value={formData.title}
                 onChange={e => setFormData({ ...formData, title: e.target.value })}
                 placeholder="E.g. Complete Q3 Report"
+                disabled={editingTarget !== null && !isAdmin && editingTarget.assignedById !== session.user.id}
               />
             </div>
 
@@ -416,12 +532,16 @@ export default function TargetsClient({
                 <Label>Assign To <span className="text-destructive">*</span></Label>
                 <Select value={formData.assignedToId} onValueChange={val => { if (val) setFormData({ ...formData, assignedToId: val }); }}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select Employee">
-                      {users.find(u => u.id === formData.assignedToId)?.name || "Select Employee"}
+                    <SelectValue placeholder="Select User">
+                      {formData.assignedToId === session.user.id ? `${session.user.name} (Me)` : (users.find(u => u.id === formData.assignedToId)?.name || "Select User")}
                     </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
-                    {users.map(u => <SelectItem key={u.id} value={u.id}>{u.name}</SelectItem>)}
+                    {users.map(u => (
+                      <SelectItem key={u.id} value={u.id}>
+                        {u.id === session.user.id ? `${u.name} (Me)` : u.name}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -430,7 +550,11 @@ export default function TargetsClient({
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
                 <Label>Priority</Label>
-                <Select value={formData.priority} onValueChange={val => { if (val) setFormData({ ...formData, priority: val as TargetPriority }); }}>
+                <Select 
+                  value={formData.priority} 
+                  onValueChange={val => { if (val) setFormData({ ...formData, priority: val as TargetPriority }); }}
+                  disabled={editingTarget !== null && !isAdmin && editingTarget.assignedById !== session.user.id}
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -443,7 +567,11 @@ export default function TargetsClient({
               </div>
               <div className="grid gap-2">
                 <Label>Timeframe</Label>
-                <Select value={formData.timeframe} onValueChange={val => { if (val) setFormData({ ...formData, timeframe: val as TargetTimeframe }); }}>
+                <Select 
+                  value={formData.timeframe} 
+                  onValueChange={val => { if (val) setFormData({ ...formData, timeframe: val as TargetTimeframe }); }}
+                  disabled={editingTarget !== null && !isAdmin && editingTarget.assignedById !== session.user.id}
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -464,9 +592,11 @@ export default function TargetsClient({
                   type="date"
                   value={formData.dueDate}
                   onChange={e => setFormData({ ...formData, dueDate: e.target.value })}
+                  disabled={editingTarget !== null && !isAdmin && editingTarget.assignedById !== session.user.id}
                 />
               </div>
-              {editingTarget && isAdmin && (
+              
+              {editingTarget && (
                 <div className="grid gap-2">
                   <Label>Status</Label>
                   <Select value={formData.status} onValueChange={val => { if (val) setFormData({ ...formData, status: val as TargetStatus }); }}>
@@ -477,7 +607,9 @@ export default function TargetsClient({
                       <SelectItem value="PENDING">Pending</SelectItem>
                       <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
                       <SelectItem value="COMPLETED">Completed</SelectItem>
-                      <SelectItem value="OVERDUE">Overdue</SelectItem>
+                      {(isAdmin || editingTarget.assignedById === session.user.id) && (
+                        <SelectItem value="OVERDUE">Overdue</SelectItem>
+                      )}
                     </SelectContent>
                   </Select>
                 </div>
@@ -493,11 +625,12 @@ export default function TargetsClient({
                 onChange={e => setFormData({ ...formData, description: e.target.value })}
                 placeholder="Optional details..."
                 className="resize-y"
+                disabled={editingTarget !== null && !isAdmin && editingTarget.assignedById !== session.user.id}
               />
             </div>
 
             {formErr && (
-              <div className="bg-destructive/10 text-destructive px-3 py-2 rounded-lg text-sm font-medium border border-destructive/20">
+              <div className="bg-destructive/10 text-destructive px-3 py-2 rounded-lg text-sm font-medium border border-destructive/20 animate-bounce">
                 {formErr}
               </div>
             )}
