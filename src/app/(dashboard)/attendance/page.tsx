@@ -99,6 +99,7 @@ function EmployeeView({ userId }: { userId: string }) {
   const [msg, setMsg] = useState<{ text: string; ok: boolean } | null>(null);
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [pickerYear, setPickerYear] = useState(parseInt(currentMonthValue().slice(0, 4), 10));
+  const { confirm, ConfirmDialog } = useConfirm();
 
   useEffect(() => {
     if (popoverOpen) {
@@ -156,6 +157,12 @@ function EmployeeView({ userId }: { userId: string }) {
   }
 
   async function handleCheckOut() {
+    const ok = await confirm(
+      "Confirm Check Out",
+      "Are you sure you want to check out? Once you check out, you will not be able to check in again today."
+    );
+    if (!ok) return;
+
     setActionLoading(true);
     setMsg(null);
     const res = await fetch("/api/attendance/checkout", { method: "POST" });
@@ -379,6 +386,7 @@ function EmployeeView({ userId }: { userId: string }) {
           </div>
         )}
       </div>
+      <ConfirmDialog />
     </div>
   );
 }
