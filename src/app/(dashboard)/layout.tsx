@@ -10,6 +10,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 const adminLinks = [
   { href: "/", label: "Dashboard" },
   { href: "/attendance", label: "Attendance" },
+  { href: "/leaves", label: "Leaves" },
   { href: "/logs", label: "Daily Logs" },
   { href: "/targets", label: "Targets" },
   { href: "/pay", label: "Pay Records" },
@@ -23,6 +24,7 @@ const adminLinks = [
 const employeeLinks = [
   { href: "/", label: "Dashboard" },
   { href: "/attendance", label: "Attendance" },
+  { href: "/leaves", label: "Leaves" },
   { href: "/logs", label: "Daily Logs" },
   { href: "/targets", label: "Targets" },
   { href: "/calendar", label: "Calendar" },

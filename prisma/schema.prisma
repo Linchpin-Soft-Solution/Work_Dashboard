@@ -27,6 +27,7 @@ model User {
   MonthlyLog                       MonthlyLog[]
   PayRecord                        PayRecord[]
   WeeklyLog                        WeeklyLog[]
+  Leave                            Leave[]
   Target_Target_assignedByIdToUser Target[]        @relation("Target_assignedByIdToUser")
   Target_Target_assignedToIdToUser Target[]        @relation("Target_assignedToIdToUser")
 }
@@ -246,6 +247,40 @@ enum AttendanceStatus {
   LATE
   ABSENT
   HOLIDAY
+  LEAVE
+}
+
+enum LeaveType {
+  CASUAL
+  SICK
+  PAID
+  UNPAID
+  UNINFORMED
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model Leave {
+  id           String      @id @default(cuid())
+  userId       String
+  startDate    DateTime
+  endDate      DateTime
+  type         LeaveType   @default(CASUAL)
+  reason       String
+  status       LeaveStatus @default(PENDING)
+  managerNote  String?
+  approvedById String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  User         User        @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([status])
 }
 
 enum InvoiceStatus {

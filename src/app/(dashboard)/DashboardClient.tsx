@@ -16,11 +16,13 @@ type DashboardStats = {
     absentToday: number;
     openTargets: number;
     openInvoices: number;
+    pendingLeaves?: any[];
   };
   employeeStats?: {
     attendanceToday: "PRESENT" | "LATE" | "ABSENT" | "HOLIDAY" | null;
     openTargets: number;
     logSubmittedToday: boolean;
+    myRecentLeaves?: any[];
   };
   activeTargets: any[];
   upcomingEvents: any[];
@@ -146,7 +148,7 @@ export default function DashboardClient({ stats }: { stats: DashboardStats }) {
         </div>
       )}
 
-      <div className="grid gap-4 md:grid-cols-2 mt-8">
+      <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mt-8">
         <Card className="col-span-1">
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
@@ -193,7 +195,7 @@ export default function DashboardClient({ stats }: { stats: DashboardStats }) {
             )}
           </CardContent>
         </Card>
-
+ 
         <Card className="col-span-1">
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
@@ -233,6 +235,64 @@ export default function DashboardClient({ stats }: { stats: DashboardStats }) {
             ) : (
               <div className="text-sm text-slate-500 py-4 text-center">
                 No upcoming events found.
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className="col-span-1">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle>{isAdmin ? "Pending Leaves" : "My Leaves"}</CardTitle>
+              <CardDescription>
+                {isAdmin ? "Requests awaiting your approval." : "Status of your recent leave requests."}
+              </CardDescription>
+            </div>
+            <Link href="/leaves" className="text-sm text-blue-600 hover:text-blue-800 flex items-center">
+              View all <ArrowRight className="ml-1 w-4 h-4" />
+            </Link>
+          </CardHeader>
+          <CardContent>
+            {isAdmin && stats.adminStats?.pendingLeaves && stats.adminStats.pendingLeaves.length > 0 ? (
+              <div className="space-y-4">
+                {stats.adminStats.pendingLeaves.map((leave) => (
+                  <div key={leave.id} className="flex items-center justify-between border-b dark:border-gray-800 pb-3 last:border-0 last:pb-0">
+                    <div className="space-y-1">
+                      <p className="text-sm font-semibold leading-none">{leave.User.name}</p>
+                      <p className="text-xs text-slate-500 mt-1">
+                        {leave.type} · {format(new Date(leave.startDate), "MMM d")} - {format(new Date(leave.endDate), "MMM d")}
+                      </p>
+                    </div>
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800/50">
+                      Pending
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ) : !isAdmin && stats.employeeStats?.myRecentLeaves && stats.employeeStats.myRecentLeaves.length > 0 ? (
+              <div className="space-y-4">
+                {stats.employeeStats.myRecentLeaves.map((leave) => (
+                  <div key={leave.id} className="flex items-center justify-between border-b dark:border-gray-800 pb-3 last:border-0 last:pb-0">
+                    <div className="space-y-1">
+                      <p className="text-sm font-semibold leading-none">{leave.type}</p>
+                      <p className="text-xs text-slate-500 mt-1">
+                        {format(new Date(leave.startDate), "MMM d")} - {format(new Date(leave.endDate), "MMM d")}
+                      </p>
+                    </div>
+                    <span className={cn(
+                      "inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold border",
+                      leave.status === "PENDING" ? "bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 border-amber-200" :
+                      leave.status === "APPROVED" ? "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-emerald-200" :
+                      "bg-rose-50 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 border-rose-200"
+                    )}>
+                      {leave.status}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-sm text-slate-500 py-4 text-center">
+                {isAdmin ? "All caught up! No pending requests." : "No leave requests logged."}
               </div>
             )}
           </CardContent>

@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
           lte: endDate,
         },
         status: {
-          in: ["PRESENT", "LATE", "ABSENT"]
+          in: ["PRESENT", "LATE", "ABSENT", "LEAVE"]
         }
       }
     });

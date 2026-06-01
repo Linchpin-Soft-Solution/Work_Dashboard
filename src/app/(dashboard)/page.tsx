@@ -22,7 +22,7 @@ export default async function DashboardPage() {
   let activeTargets;
 
   if (role === "ADMIN") {
-    const [events, targets, totalUsers, todaysAttendance, openTargets, openInvoices] = await Promise.all([
+    const [events, targets, totalUsers, todaysAttendance, openTargets, openInvoices, pendingLeaves] = await Promise.all([
       prisma.calendarEvent.findMany({
         where: {
           startTime: { gte: today },
@@ -60,7 +60,22 @@ export default async function DashboardPage() {
         _count: true
       }),
       prisma.target.count({ where: { status: { in: ['PENDING', 'IN_PROGRESS', 'OVERDUE'] } } }),
-      prisma.invoice.count({ where: { status: { in: ['DRAFT', 'SENT'] } } })
+      prisma.invoice.count({ where: { status: { in: ['DRAFT', 'SENT'] } } }),
+      prisma.leave.findMany({
+        where: { status: "PENDING" },
+        select: {
+          id: true,
+          type: true,
+          startDate: true,
+          endDate: true,
+          reason: true,
+          User: {
+            select: { name: true }
+          }
+        },
+        orderBy: { startDate: 'asc' },
+        take: 5
+      })
     ]);
 
     upcomingEvents = events;
@@ -76,10 +91,11 @@ export default async function DashboardPage() {
       lateToday,
       absentToday,
       openTargets,
-      openInvoices
+      openInvoices,
+      pendingLeaves
     };
   } else {
-    const [events, targets, attendance, openTargetsCount, dailyLog] = await Promise.all([
+    const [events, targets, attendance, openTargetsCount, dailyLog, myRecentLeaves] = await Promise.all([
       prisma.calendarEvent.findMany({
         where: {
           startTime: { gte: today },
@@ -119,6 +135,18 @@ export default async function DashboardPage() {
       prisma.dailyLog.findFirst({
         where: { userId, date: { gte: start, lte: end } },
         select: { id: true }
+      }),
+      prisma.leave.findMany({
+        where: { userId },
+        select: {
+          id: true,
+          type: true,
+          startDate: true,
+          endDate: true,
+          status: true
+        },
+        orderBy: { startDate: 'desc' },
+        take: 5
       })
     ]);
 
@@ -128,7 +156,8 @@ export default async function DashboardPage() {
     employeeStats = {
       attendanceToday: attendance?.status || null,
       openTargets: openTargetsCount,
-      logSubmittedToday: !!dailyLog || (attendance?.dailyLogSubmitted ?? false)
+      logSubmittedToday: !!dailyLog || (attendance?.dailyLogSubmitted ?? false),
+      myRecentLeaves
     };
   }
 
