@@ -78,10 +78,11 @@ describe("Pay Records API", () => {
         baseMonthlySalary: 30000 
       } as any)
       
-      // Mock attendances: 1 present (1.0), 1 late (0.5), 1 absent (0.0)
+      // Mock attendances: 1 present (1.0), 1 late (0.5), 1 paid leave (1.0), 1 absent (0.0)
       mockPrisma.attendance.findMany.mockResolvedValueOnce([
         { status: "PRESENT", payMultiplier: 1.0 },
         { status: "LATE", payMultiplier: 0.5 },
+        { status: "LEAVE", payMultiplier: 1.0 },
         { status: "ABSENT", payMultiplier: 0.0 },
       ] as any)
       
@@ -102,13 +103,14 @@ describe("Pay Records API", () => {
       expect(res.status).toBe(200)
 
       // 30000 / 30 = 1000 per day
-      // 1000 * (1.0 + 0.5 + 0.0) = 1500
+      // 1000 * (1.0 + 0.5 + 1.0 + 0.0) = 2500
       expect(mockPrisma.payRecord.create).toHaveBeenCalledWith(expect.objectContaining({
         data: expect.objectContaining({
-          calculatedPay: 1500,
-          finalPay: 1500,
+          calculatedPay: 2500,
+          finalPay: 2500,
           presentDays: 1,
           lateDays: 1,
+          leaveDays: 1,
           absentDays: 1
         })
       }))

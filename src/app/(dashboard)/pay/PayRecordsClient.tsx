@@ -26,6 +26,7 @@ interface PayRecord {
   workingDays: number;
   presentDays: number;
   lateDays: number;
+  leaveDays?: number;
   absentDays: number;
   calculatedPay: number;
   finalPay: number;
@@ -256,6 +257,10 @@ function PayRecordCard({ record, isAdmin, onUpdated }: {
           <span className="text-xs font-medium text-amber-700 dark:text-amber-400">Late</span>
           <span className="text-sm font-bold text-amber-800 dark:text-amber-300">{record.lateDays}</span>
         </div>
+        <div className="flex items-center gap-2 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900/30 rounded-xl px-3 py-2">
+          <span className="text-xs font-medium text-blue-700 dark:text-blue-400">Paid Leave</span>
+          <span className="text-sm font-bold text-blue-800 dark:text-blue-300">{record.leaveDays ?? 0}</span>
+        </div>
         <div className="flex items-center gap-2 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/30 rounded-xl px-3 py-2">
           <span className="text-xs font-medium text-red-600 dark:text-red-400">Absent</span>
           <span className="text-sm font-bold text-red-700 dark:text-red-300">{record.absentDays}</span>
@@ -313,7 +318,7 @@ function PayRecordCard({ record, isAdmin, onUpdated }: {
 
 // ─── CSV Export ───────────────────────────────────────────────────────────────
 function exportCSV(records: PayRecord[], month: string) {
-  const header = ["Employee", "Month", "Base Salary", "Working Days", "Present", "Late", "Absent", "Base Pay", "Adjustments", "Final Pay"];
+  const header = ["Employee", "Month", "Base Salary", "Working Days", "Present", "Late", "Paid Leave", "Absent", "Base Pay", "Adjustments", "Final Pay"];
   const rows = records.map(r => {
     const adjTotal = r.PayAdjustment.reduce((s, a) => s + (a.type === "DEDUCTION" ? -a.amount : a.amount), 0);
     return [
@@ -323,6 +328,7 @@ function exportCSV(records: PayRecord[], month: string) {
       r.workingDays,
       r.presentDays,
       r.lateDays,
+      r.leaveDays ?? 0,
       r.absentDays,
       r.calculatedPay.toFixed(2),
       adjTotal.toFixed(2),
@@ -462,6 +468,7 @@ function AdminView({ users }: { users: User[] }) {
                   <th className="px-5 py-3 text-right font-medium">Base Salary</th>
                   <th className="px-5 py-3 text-right font-medium">Present</th>
                   <th className="px-5 py-3 text-right font-medium">Late</th>
+                  <th className="px-5 py-3 text-right font-medium">Paid Leave</th>
                   <th className="px-5 py-3 text-right font-medium">Absent</th>
                   <th className="px-5 py-3 text-right font-medium">Base Pay</th>
                   <th className="px-5 py-3 text-right font-medium">Final Pay</th>
@@ -478,6 +485,7 @@ function AdminView({ users }: { users: User[] }) {
                     <td className="px-5 py-3 text-right text-gray-600 dark:text-gray-400">{fmt(r.baseSalary)}</td>
                     <td className="px-5 py-3 text-right text-emerald-600 dark:text-emerald-500 font-medium">{r.presentDays}</td>
                     <td className="px-5 py-3 text-right text-amber-600 dark:text-amber-500 font-medium">{r.lateDays}</td>
+                    <td className="px-5 py-3 text-right text-blue-600 dark:text-blue-500 font-medium">{r.leaveDays ?? 0}</td>
                     <td className="px-5 py-3 text-right text-red-500 dark:text-red-400 font-medium">{r.absentDays}</td>
                     <td className="px-5 py-3 text-right text-gray-600 dark:text-gray-400">{fmt(r.calculatedPay)}</td>
                     <td className="px-5 py-3 text-right font-bold text-indigo-600 dark:text-indigo-400">{fmt(r.finalPay)}</td>

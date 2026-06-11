@@ -192,6 +192,7 @@ model PayRecord {
   workingDays   Int
   presentDays   Int
   lateDays      Int
+  leaveDays     Int             @default(0)
   absentDays    Int             @default(0)
   calculatedPay Float
   finalPay      Float           @default(0.0)

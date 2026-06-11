@@ -80,12 +80,14 @@ export async function POST(req: NextRequest) {
 
     let presentDays = 0;
     let lateDays = 0;
+    let leaveDays = 0;
     let absentDays = 0;
     let sumMultiplier = 0;
 
     for (const a of attendances) {
       if (a.status === "PRESENT") presentDays++;
       else if (a.status === "LATE") lateDays++;
+      else if (a.status === "LEAVE" && a.payMultiplier > 0) leaveDays++;
       else if (a.status === "ABSENT") absentDays++;
       
       sumMultiplier += a.payMultiplier;
@@ -123,6 +125,7 @@ export async function POST(req: NextRequest) {
           workingDays,
           presentDays,
           lateDays,
+          leaveDays,
           absentDays,
           calculatedPay,
           finalPay,
@@ -141,6 +144,7 @@ export async function POST(req: NextRequest) {
           workingDays,
           presentDays,
           lateDays,
+          leaveDays,
           absentDays,
           calculatedPay,
           finalPay,

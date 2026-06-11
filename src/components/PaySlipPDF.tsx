@@ -138,6 +138,10 @@ export const PaySlipPDF = ({ payRecord, companyDetails }: PaySlipPDFProps) => {
             <Text style={styles.attendanceValue}>{payRecord.lateDays}</Text>
           </View>
           <View style={styles.attendanceBox}>
+            <Text style={styles.attendanceLabel}>Paid Leave</Text>
+            <Text style={styles.attendanceValue}>{payRecord.leaveDays ?? 0}</Text>
+          </View>
+          <View style={styles.attendanceBox}>
             <Text style={styles.attendanceLabel}>Absent</Text>
             <Text style={styles.attendanceValue}>{payRecord.absentDays}</Text>
           </View>
