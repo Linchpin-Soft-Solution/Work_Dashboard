@@ -2,8 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 
@@ -20,7 +18,6 @@ export default function ReportsClient() {
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState("");
-  const [sendEmail, setSendEmail] = useState(false);
 
   useEffect(() => {
     fetchReports();
@@ -46,7 +43,7 @@ export default function ReportsClient() {
       const res = await fetch("/api/reports/daily", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sendEmail }),
+        body: JSON.stringify({ sendEmail: false }),
       });
       if (!res.ok) {
         const data = await res.json();
@@ -71,26 +68,14 @@ export default function ReportsClient() {
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <h1 className="text-2xl font-bold tracking-tight text-foreground">Daily Reports</h1>
-        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="sendEmail"
-              checked={sendEmail}
-              onCheckedChange={(checked) => setSendEmail(checked as boolean)}
-            />
-            <Label htmlFor="sendEmail" className="font-medium cursor-pointer">
-              Email to Admins
-            </Label>
-          </div>
-          <Button
-            onClick={handleGenerate}
-            disabled={generating}
-            className="w-full sm:w-auto"
-          >
-            {generating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {generating ? "Generating..." : "Generate Today's Report"}
-          </Button>
-        </div>
+        <Button
+          onClick={handleGenerate}
+          disabled={generating}
+          className="w-full sm:w-auto"
+        >
+          {generating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          {generating ? "Generating..." : "Generate Today's Report"}
+        </Button>
       </div>
 
       {error && <div className="p-4 bg-destructive/10 text-destructive rounded-md text-sm font-medium">{error}</div>}

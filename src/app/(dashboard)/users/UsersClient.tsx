@@ -210,6 +210,8 @@ export default function UsersClient({ initialUsers, currentUserId }: UsersClient
                     <SelectItem value="ADMIN">Admin</SelectItem>
                     <SelectItem value="EMPLOYEE">Employee</SelectItem>
                     <SelectItem value="INTERN">Intern</SelectItem>
+                    <SelectItem value="SALES_MANAGER">Sales Manager</SelectItem>
+                    <SelectItem value="SALES_REP">Sales Rep</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -345,6 +347,8 @@ export default function UsersClient({ initialUsers, currentUserId }: UsersClient
                     <SelectItem value="ADMIN">Admin</SelectItem>
                     <SelectItem value="EMPLOYEE">Employee</SelectItem>
                     <SelectItem value="INTERN">Intern</SelectItem>
+                    <SelectItem value="SALES_MANAGER">Sales Manager</SelectItem>
+                    <SelectItem value="SALES_REP">Sales Rep</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

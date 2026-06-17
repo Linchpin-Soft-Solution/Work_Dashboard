@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { redirect } from "next/navigation";
 import { startOfDay, endOfDay } from "date-fns";
 import DashboardClient from "./DashboardClient";
 
@@ -8,6 +9,11 @@ export default async function DashboardPage() {
 
   if (!session?.user?.id) {
     return null;
+  }
+
+  // Sales roles live entirely in the CRM — send them there from the root.
+  if (session.user.role === "SALES_MANAGER" || session.user.role === "SALES_REP") {
+    redirect("/crm");
   }
 
   const role = session.user.role as "ADMIN" | "EMPLOYEE" | "INTERN";

@@ -30,6 +30,10 @@ model User {
   Leave                            Leave[]
   Target_Target_assignedByIdToUser Target[]        @relation("Target_assignedByIdToUser")
   Target_Target_assignedToIdToUser Target[]        @relation("Target_assignedToIdToUser")
+  Prospect_assignedRep             Prospect[]      @relation("Prospect_assignedRep")
+  Call                             Call[]          @relation("Call_user")
+  Remark                           Remark[]        @relation("Remark_user")
+  CrmActivity                      CrmActivity[]   @relation("CrmActivity_user")
 }
 
 model Attendance {
@@ -241,6 +245,33 @@ enum Role {
   ADMIN
   EMPLOYEE
   INTERN
+  SALES_MANAGER
+  SALES_REP
+}
+
+enum CallOutcome {
+  CONNECTED_INTERESTED
+  CONNECTED_CALLBACK
+  CONNECTED_NOT_INTERESTED
+  NO_ANSWER
+  UNREACHABLE
+  WRONG_NUMBER
+}
+
+enum LeadSource {
+  REFERRAL
+  INBOUND
+  COLD_LIST
+  EVENT
+  OTHER
+}
+
+enum CrmActivityType {
+  CALL
+  REMARK
+  STAGE_CHANGE
+  ASSIGNMENT
+  FOLLOW_UP_SET
 }
 
 enum AttendanceStatus {
@@ -315,4 +346,93 @@ enum TargetTimeframe {
   DAILY
   WEEKLY
   MONTHLY
+}
+
+model PipelineStage {
+  id        String     @id @default(cuid())
+  name      String
+  sortOrder Int
+  isWon     Boolean    @default(false)
+  isLost    Boolean    @default(false)
+  isActive  Boolean    @default(true)
+  createdAt DateTime   @default(now())
+
+  Prospect Prospect[]
+
+  @@index([sortOrder])
+}
+
+model Prospect {
+  id              String       @id @default(cuid())
+  companyName     String
+  contactName     String
+  phone           String       @unique // dedupe key
+  email           String?
+  city            String?
+  industry        String?
+  source          LeadSource   @default(OTHER)
+  dealValue       Float? // INR rupees, optional
+  stageId         String
+  assignedRepId   String
+  nextFollowUpAt  DateTime?
+  lastCallOutcome CallOutcome? // denormalized for board cards
+  lostReason      String?
+  isInvalid       Boolean      @default(false) // wrong/invalid number
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  Stage      PipelineStage @relation(fields: [stageId], references: [id])
+  Rep        User          @relation("Prospect_assignedRep", fields: [assignedRepId], references: [id])
+  Calls      Call[]
+  Remarks    Remark[]
+  Activities CrmActivity[]
+
+  @@index([assignedRepId])
+  @@index([stageId])
+  @@index([nextFollowUpAt])
+}
+
+model Call {
+  id              String      @id @default(cuid())
+  prospectId      String
+  userId          String
+  outcome         CallOutcome
+  durationSeconds Int?
+  remark          String?
+  calledAt        DateTime    @default(now())
+
+  Prospect Prospect @relation(fields: [prospectId], references: [id], onDelete: Cascade)
+  User     User     @relation("Call_user", fields: [userId], references: [id])
+
+  @@index([prospectId])
+  @@index([userId])
+  @@index([calledAt])
+}
+
+model Remark {
+  id         String   @id @default(cuid())
+  prospectId String
+  userId     String
+  text       String
+  createdAt  DateTime @default(now())
+
+  Prospect Prospect @relation(fields: [prospectId], references: [id], onDelete: Cascade)
+  User     User     @relation("Remark_user", fields: [userId], references: [id])
+
+  @@index([prospectId])
+}
+
+model CrmActivity {
+  id         String          @id @default(cuid())
+  prospectId String
+  userId     String
+  type       CrmActivityType
+  detail     String
+  createdAt  DateTime        @default(now())
+
+  Prospect Prospect @relation(fields: [prospectId], references: [id], onDelete: Cascade)
+  User     User     @relation("CrmActivity_user", fields: [userId], references: [id])
+
+  @@index([prospectId])
+  @@index([createdAt])
 }

@@ -17,6 +17,7 @@ const adminLinks = [
   { href: "/invoices", label: "Invoices" },
   { href: "/calendar", label: "Calendar" },
   { href: "/reports", label: "Reports" },
+  { href: "/crm", label: "Sales CRM" },
   { href: "/users", label: "User Management" },
   { href: "/audit", label: "Audit Log" },
 ];
@@ -31,6 +32,29 @@ const employeeLinks = [
   { href: "/pay", label: "Pay Records" },
 ];
 
+const crmManagerLinks = [
+  { href: "/crm", label: "CRM Dashboard" },
+  { href: "/crm/prospects", label: "Prospects" },
+  { href: "/crm/follow-ups", label: "Follow-ups" },
+  { href: "/crm/reports", label: "Reports" },
+  { href: "/crm/stages", label: "Pipeline Settings" },
+  { href: "/crm/import", label: "Import" },
+];
+
+const crmRepLinks = [
+  { href: "/crm", label: "CRM Dashboard" },
+  { href: "/crm/prospects", label: "Prospects" },
+  { href: "/crm/follow-ups", label: "Follow-ups" },
+];
+
+const roleLabels: Record<string, string> = {
+  ADMIN: "Admin",
+  EMPLOYEE: "Employee",
+  INTERN: "Intern",
+  SALES_MANAGER: "Sales Manager",
+  SALES_REP: "Sales Rep",
+};
+
 export default async function DashboardLayout({
   children,
 }: {
@@ -40,8 +64,16 @@ export default async function DashboardLayout({
 
   if (!session) redirect("/login");
 
-  const isAdmin = session.user.role === "ADMIN";
-  const links = isAdmin ? adminLinks : employeeLinks;
+  const role = session.user.role;
+  const roleLabel = roleLabels[role] ?? "Employee";
+  const links =
+    role === "ADMIN"
+      ? adminLinks
+      : role === "SALES_MANAGER"
+        ? crmManagerLinks
+        : role === "SALES_REP"
+          ? crmRepLinks
+          : employeeLinks;
 
   const sidebarContent = (
     <>
@@ -55,12 +87,12 @@ export default async function DashboardLayout({
           priority
         />
         <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
-          {isAdmin ? "Admin" : "Employee"} · {session.user.name}
+          {roleLabel} · {session.user.name}
         </p>
       </div>
       <div className="md:hidden px-5 py-4 border-b border-gray-100 dark:border-gray-800">
         <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">{session.user.name}</p>
-        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{isAdmin ? "Admin" : "Employee"}</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{roleLabel}</p>
       </div>
 
       <SidebarNav links={links} />
