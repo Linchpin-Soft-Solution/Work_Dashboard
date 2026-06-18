@@ -274,6 +274,12 @@ enum CrmActivityType {
   FOLLOW_UP_SET
 }
 
+enum PackageTier {
+  SILVER
+  GOLD
+  PLATINUM
+}
+
 enum AttendanceStatus {
   PRESENT
   LATE
@@ -371,6 +377,7 @@ model Prospect {
   city            String?
   industry        String?
   source          LeadSource   @default(OTHER)
+  packageTier     PackageTier? // Silver / Gold / Platinum, optional
   dealValue       Float? // INR rupees, optional
   stageId         String
   assignedRepId   String

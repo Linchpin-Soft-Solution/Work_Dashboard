@@ -4,9 +4,10 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { buttonVariants } from "@/components/ui/button";
-import { Loader2, PhoneCall, AlertCircle, CalendarClock, Trophy, Users } from "lucide-react";
-import { formatINR, stageDotClass } from "./types";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { Loader2, PhoneCall, AlertCircle, CalendarClock, Trophy, Users, PlusIcon } from "lucide-react";
+import { formatINR, stageDotClass, RepRef } from "./types";
+import NewProspectDialog from "./NewProspectDialog";
 
 interface PipelineRow {
   stageId: string;
@@ -58,9 +59,18 @@ function StatCard({
   );
 }
 
-export default function CrmDashboardClient({ userName }: { userName: string }) {
+export default function CrmDashboardClient({
+  userName,
+  isManager,
+  reps,
+}: {
+  userName: string;
+  isManager: boolean;
+  reps: RepRef[];
+}) {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [addOpen, setAddOpen] = useState(false);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -102,7 +112,10 @@ export default function CrmDashboardClient({ userName }: { userName: string }) {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Link href="/crm/prospects" className={buttonVariants()}>
+          <Button onClick={() => setAddOpen(true)}>
+            <PlusIcon className="h-4 w-4 mr-1" /> Add Client
+          </Button>
+          <Link href="/crm/prospects" className={buttonVariants({ variant: "outline" })}>
             <Users className="h-4 w-4 mr-1" /> Prospects
           </Link>
           <Link href="/crm/follow-ups" className={buttonVariants({ variant: "outline" })}>
@@ -193,6 +206,14 @@ export default function CrmDashboardClient({ userName }: { userName: string }) {
           </CardContent>
         </Card>
       )}
+
+      <NewProspectDialog
+        open={addOpen}
+        onOpenChange={setAddOpen}
+        isManager={isManager}
+        reps={reps}
+        onCreated={fetchData}
+      />
     </div>
   );
 }

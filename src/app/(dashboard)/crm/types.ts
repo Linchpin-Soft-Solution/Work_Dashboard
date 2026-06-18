@@ -10,6 +10,8 @@ export type CallOutcome =
 
 export type LeadSource = "REFERRAL" | "INBOUND" | "COLD_LIST" | "EVENT" | "OTHER";
 
+export type PackageTier = "SILVER" | "GOLD" | "PLATINUM";
+
 export type CrmActivityType = "CALL" | "REMARK" | "STAGE_CHANGE" | "ASSIGNMENT" | "FOLLOW_UP_SET";
 
 export interface Stage {
@@ -35,6 +37,7 @@ export interface Prospect {
   city: string | null;
   industry: string | null;
   source: LeadSource;
+  packageTier: PackageTier | null;
   dealValue: number | null;
   stageId: string;
   assignedRepId: string;
@@ -105,6 +108,26 @@ export const SOURCE_LABELS: Record<LeadSource, string> = {
 };
 
 export const SOURCE_ORDER: LeadSource[] = ["REFERRAL", "INBOUND", "COLD_LIST", "EVENT", "OTHER"];
+
+export const PACKAGE_LABELS: Record<PackageTier, string> = {
+  SILVER: "Silver",
+  GOLD: "Gold",
+  PLATINUM: "Platinum",
+};
+
+export const PACKAGE_ORDER: PackageTier[] = ["SILVER", "GOLD", "PLATINUM"];
+
+// Coloured pill classes for a package tier.
+export function packageBadgeClass(tier: PackageTier): string {
+  switch (tier) {
+    case "SILVER":
+      return "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300 border-transparent";
+    case "GOLD":
+      return "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border-transparent";
+    case "PLATINUM":
+      return "bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400 border-transparent";
+  }
+}
 
 export function formatINR(value: number | null | undefined): string {
   if (value == null) return "—";

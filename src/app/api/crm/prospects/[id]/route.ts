@@ -88,6 +88,9 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
     if (body.dealValue !== undefined) {
       data.dealValue = body.dealValue === null || body.dealValue === "" ? null : Number(body.dealValue);
     }
+    if (body.packageTier !== undefined) {
+      data.packageTier = body.packageTier ? body.packageTier : null;
+    }
     if (body.isInvalid !== undefined) data.isInvalid = Boolean(body.isInvalid);
     if (body.nextFollowUpAt !== undefined) {
       data.nextFollowUpAt = body.nextFollowUpAt ? new Date(body.nextFollowUpAt) : null;

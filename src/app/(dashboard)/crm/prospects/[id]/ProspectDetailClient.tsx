@@ -48,12 +48,16 @@ import {
   OUTCOME_ORDER,
   SOURCE_LABELS,
   SOURCE_ORDER,
+  PackageTier,
+  PACKAGE_LABELS,
+  PACKAGE_ORDER,
   formatINR,
   formatDate,
   formatDateTime,
   followUpStatus,
   stageBadgeClass,
   outcomeBadgeClass,
+  packageBadgeClass,
 } from "../../types";
 
 type TimelineItem = {
@@ -118,6 +122,7 @@ export default function ProspectDetailClient({
     city: "",
     industry: "",
     source: "OTHER" as LeadSource,
+    packageTier: "" as PackageTier | "",
     dealValue: "",
     lostReason: "",
     assignedRepId: "",
@@ -214,6 +219,7 @@ export default function ProspectDetailClient({
       city: prospect.city ?? "",
       industry: prospect.industry ?? "",
       source: prospect.source,
+      packageTier: prospect.packageTier ?? "",
       dealValue: prospect.dealValue != null ? String(prospect.dealValue) : "",
       lostReason: prospect.lostReason ?? "",
       assignedRepId: prospect.assignedRepId,
@@ -233,6 +239,7 @@ export default function ProspectDetailClient({
           city: editForm.city,
           industry: editForm.industry,
           source: editForm.source,
+          packageTier: editForm.packageTier || null,
           dealValue: editForm.dealValue === "" ? null : editForm.dealValue,
           lostReason: editForm.lostReason,
           ...(isManager ? { assignedRepId: editForm.assignedRepId } : {}),
@@ -276,6 +283,7 @@ export default function ProspectDetailClient({
   const repItems = reps.map((r) => ({ value: r.id, label: r.name }));
   const sourceItems = SOURCE_ORDER.map((s) => ({ value: s, label: SOURCE_LABELS[s] }));
   const outcomeItems = OUTCOME_ORDER.map((o) => ({ value: o, label: OUTCOME_LABELS[o] }));
+  const packageItems = PACKAGE_ORDER.map((p) => ({ value: p, label: PACKAGE_LABELS[p] }));
 
   // Merge the timeline.
   const timeline: TimelineItem[] = [
@@ -334,6 +342,11 @@ export default function ProspectDetailClient({
                 <Badge variant="outline" className={stageBadgeClass(prospect.Stage)}>
                   {prospect.Stage.name}
                 </Badge>
+                {prospect.packageTier && (
+                  <Badge variant="outline" className={packageBadgeClass(prospect.packageTier)}>
+                    {PACKAGE_LABELS[prospect.packageTier]}
+                  </Badge>
+                )}
               </div>
               <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1">
                 <Phone className="h-3 w-3" /> {prospect.contactName} · {prospect.phone}
@@ -533,6 +546,25 @@ export default function ProspectDetailClient({
                     {SOURCE_ORDER.map((s) => (
                       <SelectItem key={s} value={s}>
                         {SOURCE_LABELS[s]}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Package</Label>
+                <Select
+                  value={editForm.packageTier}
+                  onValueChange={(v) => v && setEditForm({ ...editForm, packageTier: v as PackageTier })}
+                  items={packageItems}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select package" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {PACKAGE_ORDER.map((p) => (
+                      <SelectItem key={p} value={p}>
+                        {PACKAGE_LABELS[p]}
                       </SelectItem>
                     ))}
                   </SelectContent>

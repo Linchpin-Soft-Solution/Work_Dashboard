@@ -6,7 +6,6 @@ import Link from "next/link";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -17,13 +16,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import {
   Table,
   TableBody,
   TableCell,
@@ -32,20 +24,22 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Loader2, PlusIcon, LayoutGrid, List, Phone } from "lucide-react";
+import NewProspectDialog from "../NewProspectDialog";
 import {
   Prospect,
   Stage,
   RepRef,
-  LeadSource,
   OUTCOME_LABELS,
   SOURCE_LABELS,
   SOURCE_ORDER,
+  PACKAGE_LABELS,
   formatINR,
   formatDate,
   followUpStatus,
   stageBadgeClass,
   stageDotClass,
   outcomeBadgeClass,
+  packageBadgeClass,
 } from "../types";
 
 const followUpClasses: Record<string, string> = {
@@ -53,19 +47,6 @@ const followUpClasses: Record<string, string> = {
   today: "text-amber-600 dark:text-amber-400 font-semibold",
   upcoming: "text-gray-600 dark:text-gray-400",
   none: "text-gray-400",
-};
-
-const emptyForm = {
-  companyName: "",
-  contactName: "",
-  phone: "",
-  email: "",
-  city: "",
-  industry: "",
-  source: "COLD_LIST" as LeadSource,
-  dealValue: "",
-  stageId: "",
-  assignedRepId: "",
 };
 
 export default function ProspectsClient({
@@ -89,10 +70,8 @@ export default function ProspectsClient({
   const [filterSource, setFilterSource] = useState("all");
   const [search, setSearch] = useState("");
 
-  // New prospect modal
+  // New client modal
   const [modalOpen, setModalOpen] = useState(false);
-  const [form, setForm] = useState(emptyForm);
-  const [saving, setSaving] = useState(false);
 
   const fetchStages = useCallback(async () => {
     try {
@@ -146,36 +125,6 @@ export default function ProspectsClient({
     }
   }
 
-  async function handleCreate(e: React.FormEvent) {
-    e.preventDefault();
-    setSaving(true);
-    try {
-      const res = await fetch("/api/crm/prospects", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...form,
-          stageId: form.stageId || undefined,
-          assignedRepId: isManager ? form.assignedRepId || undefined : undefined,
-        }),
-      });
-      const data = await res.json();
-      if (res.status === 409) {
-        toast.error(data.error || "Duplicate phone number");
-        return;
-      }
-      if (!res.ok) throw new Error(data.error);
-      toast.success("Prospect added");
-      setModalOpen(false);
-      setForm(emptyForm);
-      fetchProspects();
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to add prospect.");
-    } finally {
-      setSaving(false);
-    }
-  }
-
   const repName = (id: string) => reps.find((r) => r.id === id)?.name ?? "—";
 
   // Item maps so the Select trigger shows labels (names) instead of raw values (ids).
@@ -204,11 +153,18 @@ export default function ProspectsClient({
           <p className="text-xs text-gray-500">
             {p.contactName} · {p.phone}
           </p>
-          {p.lastCallOutcome && (
-            <Badge variant="outline" className={`text-[10px] ${outcomeBadgeClass(p.lastCallOutcome)}`}>
-              {OUTCOME_LABELS[p.lastCallOutcome]}
-            </Badge>
-          )}
+          <div className="flex flex-wrap gap-1">
+            {p.packageTier && (
+              <Badge variant="outline" className={`text-[10px] ${packageBadgeClass(p.packageTier)}`}>
+                {PACKAGE_LABELS[p.packageTier]}
+              </Badge>
+            )}
+            {p.lastCallOutcome && (
+              <Badge variant="outline" className={`text-[10px] ${outcomeBadgeClass(p.lastCallOutcome)}`}>
+                {OUTCOME_LABELS[p.lastCallOutcome]}
+              </Badge>
+            )}
+          </div>
           <div className="flex items-center justify-between text-xs">
             <span className={followUpClasses[fu]}>
               {p.nextFollowUpAt ? `Follow-up: ${formatDate(p.nextFollowUpAt)}` : "No follow-up"}
@@ -250,14 +206,8 @@ export default function ProspectsClient({
             {viewMode === "board" ? <List className="h-4 w-4" /> : <LayoutGrid className="h-4 w-4" />}
             <span className="ml-1">{viewMode === "board" ? "List" : "Board"}</span>
           </Button>
-          <Button
-            size="sm"
-            onClick={() => {
-              setForm({ ...emptyForm, stageId: stages[0]?.id ?? "" });
-              setModalOpen(true);
-            }}
-          >
-            <PlusIcon className="h-4 w-4 mr-1" /> New Prospect
+          <Button size="sm" onClick={() => setModalOpen(true)}>
+            <PlusIcon className="h-4 w-4 mr-1" /> New Client
           </Button>
         </div>
       </div>
@@ -416,133 +366,13 @@ export default function ProspectsClient({
         </Card>
       )}
 
-      {/* New prospect modal */}
-      <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-        <DialogContent className="max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>New Prospect</DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleCreate} className="space-y-3">
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label>Company *</Label>
-                <Input
-                  required
-                  value={form.companyName}
-                  onChange={(e) => setForm({ ...form, companyName: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label>Contact *</Label>
-                <Input
-                  required
-                  value={form.contactName}
-                  onChange={(e) => setForm({ ...form, contactName: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label>Phone *</Label>
-                <Input
-                  required
-                  value={form.phone}
-                  onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label>Email</Label>
-                <Input
-                  type="email"
-                  value={form.email}
-                  onChange={(e) => setForm({ ...form, email: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label>City</Label>
-                <Input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} />
-              </div>
-              <div>
-                <Label>Industry</Label>
-                <Input
-                  value={form.industry}
-                  onChange={(e) => setForm({ ...form, industry: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label>Source</Label>
-                <Select
-                  value={form.source}
-                  onValueChange={(v) => v && setForm({ ...form, source: v as LeadSource })}
-                  items={sourceItems}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {SOURCE_ORDER.map((s) => (
-                      <SelectItem key={s} value={s}>
-                        {SOURCE_LABELS[s]}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label>Deal value (₹)</Label>
-                <Input
-                  type="number"
-                  value={form.dealValue}
-                  onChange={(e) => setForm({ ...form, dealValue: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label>Stage</Label>
-                <Select value={form.stageId} onValueChange={(v) => v && setForm({ ...form, stageId: v })} items={stageItems}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select stage" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {stages.map((s) => (
-                      <SelectItem key={s.id} value={s.id}>
-                        {s.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              {isManager && (
-                <div>
-                  <Label>Assign to</Label>
-                  <Select
-                    value={form.assignedRepId}
-                    onValueChange={(v) => v && setForm({ ...form, assignedRepId: v })}
-                    items={repItems}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Me (default)" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {reps.map((r) => (
-                        <SelectItem key={r.id} value={r.id}>
-                          {r.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
-            </div>
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setModalOpen(false)}>
-                Cancel
-              </Button>
-              <Button type="submit" disabled={saving}>
-                {saving && <Loader2 className="h-4 w-4 mr-1 animate-spin" />}
-                Add Prospect
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+      <NewProspectDialog
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+        isManager={isManager}
+        reps={reps}
+        onCreated={fetchProspects}
+      />
     </div>
   );
 }
