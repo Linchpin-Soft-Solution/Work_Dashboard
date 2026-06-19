@@ -306,6 +306,7 @@ export default function ProspectsClient({
                   <TableHead>Last outcome</TableHead>
                   <TableHead>Follow-up</TableHead>
                   <TableHead>Value</TableHead>
+                  <TableHead>Package</TableHead>
                   {isManager && <TableHead>Rep</TableHead>}
                 </TableRow>
               </TableHeader>
@@ -345,6 +346,15 @@ export default function ProspectsClient({
                         {formatDate(p.nextFollowUpAt)}
                       </TableCell>
                       <TableCell className="text-sm">{formatINR(p.dealValue)}</TableCell>
+                      <TableCell>
+                        {p.packageTier ? (
+                          <Badge variant="outline" className={packageBadgeClass(p.packageTier)}>
+                            {PACKAGE_LABELS[p.packageTier]}
+                          </Badge>
+                        ) : (
+                          <span className="text-sm text-gray-400">—</span>
+                        )}
+                      </TableCell>
                       {isManager && (
                         <TableCell className="text-sm text-gray-500">
                           {repName(p.assignedRepId)}
@@ -355,7 +365,7 @@ export default function ProspectsClient({
                 })}
                 {prospects.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={isManager ? 7 : 6} className="text-center text-gray-400 py-8">
+                    <TableCell colSpan={isManager ? 8 : 7} className="text-center text-gray-400 py-8">
                       No prospects match your filters.
                     </TableCell>
                   </TableRow>

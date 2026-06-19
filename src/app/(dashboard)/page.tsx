@@ -11,8 +11,9 @@ export default async function DashboardPage() {
     return null;
   }
 
-  // Sales roles live entirely in the CRM — send them there from the root.
-  if (session.user.role === "SALES_MANAGER" || session.user.role === "SALES_REP") {
+  // Sales managers are CRM-focused — send them to the CRM from the root.
+  // Sales reps keep the standard employee dashboard (plus CRM links in the nav).
+  if (session.user.role === "SALES_MANAGER") {
     redirect("/crm");
   }
 
