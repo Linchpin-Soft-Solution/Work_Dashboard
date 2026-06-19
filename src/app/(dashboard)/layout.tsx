@@ -46,8 +46,9 @@ const crmRepLinks = [
   { href: "/crm/follow-ups", label: "Follow-ups" },
 ];
 
-// Sales reps get the standard employee tools plus their CRM links.
+// Sales reps and managers get the standard employee tools plus their CRM links.
 const salesRepLinks = [...employeeLinks, ...crmRepLinks];
+const salesManagerLinks = [...employeeLinks, ...crmManagerLinks];
 
 const roleLabels: Record<string, string> = {
   ADMIN: "Admin",
@@ -72,7 +73,7 @@ export default async function DashboardLayout({
     role === "ADMIN"
       ? adminLinks
       : role === "SALES_MANAGER"
-        ? crmManagerLinks
+        ? salesManagerLinks
         : role === "SALES_REP"
           ? salesRepLinks
           : employeeLinks;

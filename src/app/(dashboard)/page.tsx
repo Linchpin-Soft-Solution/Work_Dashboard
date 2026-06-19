@@ -1,6 +1,5 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { redirect } from "next/navigation";
 import { startOfDay, endOfDay } from "date-fns";
 import DashboardClient from "./DashboardClient";
 
@@ -9,12 +8,6 @@ export default async function DashboardPage() {
 
   if (!session?.user?.id) {
     return null;
-  }
-
-  // Sales managers are CRM-focused — send them to the CRM from the root.
-  // Sales reps keep the standard employee dashboard (plus CRM links in the nav).
-  if (session.user.role === "SALES_MANAGER") {
-    redirect("/crm");
   }
 
   const role = session.user.role as "ADMIN" | "EMPLOYEE" | "INTERN";
