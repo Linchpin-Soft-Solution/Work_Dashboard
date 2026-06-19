@@ -38,7 +38,6 @@ const crmManagerLinks = [
   { href: "/crm/follow-ups", label: "Follow-ups" },
   { href: "/crm/reports", label: "Reports" },
   { href: "/crm/stages", label: "Pipeline Settings" },
-  { href: "/crm/import", label: "Import" },
 ];
 
 const crmRepLinks = [
