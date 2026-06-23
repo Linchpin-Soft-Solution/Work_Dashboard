@@ -343,7 +343,6 @@ function EmployeeView({ userId }: { userId: string }) {
                   <th className="px-5 py-3 text-left font-medium">Location</th>
                   <th className="px-5 py-3 text-left font-medium">Multiplier</th>
                   <th className="px-5 py-3 text-left font-medium">Log</th>
-                  <th className="px-5 py-3 text-left font-medium"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
@@ -367,16 +366,6 @@ function EmployeeView({ userId }: { userId: string }) {
                         <span className="text-emerald-600 font-medium">✓</span>
                       ) : (
                         <span className="text-gray-300">—</span>
-                      )}
-                    </td>
-                    <td className="px-5 py-3">
-                      {r.overriddenByAdminId && (
-                        <span
-                          title={r.overrideReason ?? ""}
-                          className="text-xs bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800/50 px-2 py-0.5 rounded-full cursor-help"
-                        >
-                          Edited by Admin
-                        </span>
                       )}
                     </td>
                   </tr>
@@ -774,7 +763,6 @@ function AdminView() {
                   <th className="px-5 py-3 text-left font-medium">Location</th>
                   <th className="px-5 py-3 text-left font-medium">Multiplier</th>
                   <th className="px-5 py-3 text-left font-medium">Log</th>
-                  <th className="px-5 py-3 text-left font-medium">Note</th>
                   <th className="px-5 py-3 text-left font-medium"></th>
                 </tr>
               </thead>
@@ -804,16 +792,6 @@ function AdminView() {
                         <span className="text-emerald-600 font-medium">✓</span>
                       ) : (
                         <span className="text-gray-300">—</span>
-                      )}
-                    </td>
-                    <td className="px-5 py-3">
-                      {r.overriddenByAdminId && (
-                        <span
-                          title={r.overrideReason ?? ""}
-                          className="text-xs bg-amber-50 text-amber-600 border border-amber-200 px-2 py-0.5 rounded-full cursor-help"
-                        >
-                          Overridden
-                        </span>
                       )}
                     </td>
                     <td className="px-5 py-3">

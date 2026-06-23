@@ -6,6 +6,7 @@ import DashboardMobileNav from "@/components/DashboardMobileNav";
 import ChangePasswordDialog from "@/components/ChangePasswordDialog";
 import SignOutDialog from "@/components/SignOutDialog";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { canViewAuditLog } from "@/lib/audit-access";
 
 const adminLinks = [
   { href: "/", label: "Dashboard" },
@@ -71,7 +72,7 @@ export default async function DashboardLayout({
   const roleLabel = roleLabels[role] ?? "Employee";
   const links =
     role === "ADMIN"
-      ? adminLinks
+      ? adminLinks.filter((l) => l.href !== "/audit" || canViewAuditLog(session.user))
       : role === "SALES_MANAGER"
         ? salesManagerLinks
         : role === "SALES_REP"

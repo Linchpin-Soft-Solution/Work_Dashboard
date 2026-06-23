@@ -1,12 +1,14 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { canViewAuditLog } from "@/lib/audit-access";
 import AuditClient from "./AuditClient";
 
 export default async function AuditLogPage() {
   const session = await auth();
 
-  if (!session || session.user.role !== "ADMIN") {
+  // Restricted to a single user — other admins are not allowed.
+  if (!session || !canViewAuditLog(session.user)) {
     redirect("/");
   }
 
